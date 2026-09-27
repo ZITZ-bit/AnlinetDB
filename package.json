@@ -9,11 +9,10 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
-
     "dev:desktop": "turbo run dev --filter=desktop",
     "dev:api": "turbo run dev --filter=api",
-    
     "build": "turbo run build",
+    "package": "turbo run package",
     "lint": "turbo run lint",
     "test": "turbo run test"
   },

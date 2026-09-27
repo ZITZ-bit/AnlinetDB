@@ -1,9 +1,64 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
+const { spawn } = require("child_process");
+const http = require("http");
+
 require(path.join(__dirname, "..", "..", "lib", "core", "scripts", "windowControls.js"));
 
 let mainWindow;
 let splash;
+let nextProcess;
+
+function waitForServer(port, retries = 50) {
+  return new Promise((resolve, reject) => {
+    let attempt = 0;
+    const check = () => {
+      const req = http.request(`http://localhost:${port}/`, (res) => {
+        if (res.statusCode < 500) {
+          resolve();
+        } else {
+          attempt++;
+          if (attempt >= retries) {
+            reject(new Error("Next.js server did not start in time"));
+          } else {
+            setTimeout(check, 200);
+          }
+        }
+      });
+      req.on("error", () => {
+        attempt++;
+        if (attempt >= retries) {
+          reject(new Error("Next.js server did not start in time"));
+        } else {
+          setTimeout(check, 200);
+        }
+      });
+      req.end();
+    };
+    check();
+  });
+}
+
+function startNextServer(port) {
+  return new Promise((resolve, reject) => {
+    const baseDir = path.join(__dirname, "..");
+    const standaloneDir = path.join(baseDir, ".next", "standalone", "apps", "desktop");
+    const serverPath = path.join(standaloneDir, "server.js");
+
+    nextProcess = spawn("node", [serverPath], {
+      stdio: "inherit",
+      cwd: standaloneDir,
+    });
+
+    nextProcess.on("error", (err) => {
+      reject(err);
+    });
+
+    waitForServer(port)
+      .then(() => resolve())
+      .catch((err) => reject(err));
+  });
+}
 
 function createWindow() {
   splash = new BrowserWindow({
@@ -34,7 +89,19 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadURL("http://localhost:3000");
+  if (app.isPackaged) {
+    const PORT = process.env.NEXT_PORT || 3000;
+    startNextServer(PORT)
+      .then(() => {
+        mainWindow.loadURL(`http://localhost:${PORT}`);
+      })
+      .catch((err) => {
+        console.error("Failed to start Next.js server:", err.message);
+        app.quit();
+      });
+  } else {
+    mainWindow.loadURL("http://localhost:3000");
+  }
 
   mainWindow.once("ready-to-show", () => {
     splash.destroy();
@@ -55,4 +122,10 @@ app.whenReady().then(() => {
 
 app.on("window-all-closed", () => {
   app.quit();
+});
+
+app.on("before-quit", () => {
+  if (nextProcess) {
+    nextProcess.kill();
+  }
 });

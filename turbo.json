@@ -10,6 +10,11 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
+    "package": {
+      "dependsOn": ["build"],
+      "outputs": ["release/**"],
+      "cache": false
+    },
     "lint": {
       "outputs": []
     },

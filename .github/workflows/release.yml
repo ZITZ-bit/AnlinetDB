@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: 22
+  FORCE_COLOR: 1
+
+jobs:
+  package:
+    name: Build AnlinetDB for Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and package for Windows
+        run: npm run package
+
+      - name: Show release artifacts
+        run: |
+          Write-Host "Release artifacts:"
+          Get-ChildItem -Path apps/desktop/release -Recurse -File | ForEach-Object {
+            Write-Host "  $_.FullName ($_.Length bytes)"
+          }
+
+      - name: Upload installer to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            apps/desktop/release/*.exe
+            apps/desktop/release/*.zip
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
