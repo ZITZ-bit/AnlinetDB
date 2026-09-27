@@ -1,0 +1,30 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 2.25rem);
+  background-color: #f0fdfa;
+}
+
+.dashboard-header {
+  flex-shrink: 0;
+  background-color: #025f51;
+}
+
+.dashboard-main {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f0fdfa;
+}
+
+.dashboard-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-main::-webkit-scrollbar-thumb {
+  background: #04a777;
+  border-radius: 4px;
+}

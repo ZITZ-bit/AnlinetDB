@@ -1,0 +1,134 @@
+.cx-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 2.5rem 3.5rem;
+  width: 100%;
+}
+
+.cx-panel {
+  width: 100%;
+  max-width: 1400px;
+}
+
+.cx-panel h1 {
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  color: #025F51;
+}
+
+.cx-description {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.cx-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 5rem;
+  width: 100%;
+}
+
+.cx-side-left,
+.cx-side-right {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.cx-inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.cx-field {
+  margin-bottom: 1.8rem;
+  width: 100%;
+}
+
+.cx-field label {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.cx-field input,
+.cx-field select {
+  width: 100%;
+  padding: 1.2rem 0.75rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+  appearance: none;
+}
+
+.cx-field input:hover,
+.cx-field select:hover {
+  border-color: #9ca3af;
+}
+
+/* 🔥 Focus sin sombra */
+.cx-field input:focus,
+.cx-field select:focus {
+  border-color: #025F51;
+  box-shadow: none;
+}
+
+.cx-field span {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: #6b7280;
+  background-color: #ffffff;
+  padding: 0 0.25rem;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.cx-field input:focus + span,
+.cx-field input:not(:placeholder-shown) + span,
+.cx-field select:focus + span,
+.cx-field select:valid + span {
+  top: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #025F51;
+}
+
+.cx-full {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cx-button {
+  width: 260px;
+  margin-top: 2.5rem;
+  padding: 0.85rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #025F51;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cx-button:hover {
+  background-color: #037968;
+}
+
+.cx-button:active {
+  transform: scale(0.98);
+}
