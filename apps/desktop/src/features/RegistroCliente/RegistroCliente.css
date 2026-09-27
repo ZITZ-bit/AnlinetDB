@@ -1,0 +1,128 @@
+.rc-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 2.5rem 3.5rem;
+  width: 100%;
+}
+
+.rc-card {
+  width: 100%;
+  max-width: 1400px;
+}
+
+.rc-card h1 {
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  color: #025F51;
+}
+
+.rc-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.rc-form-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 5rem;
+  width: 100%;
+}
+
+.rc-left-column,
+.rc-right-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.rc-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.rc-input-group {
+  margin-bottom: 1.8rem;
+  width: 100%;
+}
+
+.rc-input-group label {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.rc-input-group input {
+  width: 100%;
+  padding: 1.2rem 0.75rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.rc-input-group input:hover {
+  border-color: #9ca3af;
+}
+
+/* 🔥 Focus sin sombra */
+.rc-input-group input:focus {
+  border-color: #025F51;
+  box-shadow: none;
+}
+
+.rc-input-group span {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: #6b7280;
+  background-color: #ffffff;
+  padding: 0 0.25rem;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.rc-input-group input:focus + span,
+.rc-input-group input:valid + span {
+  top: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #025F51;
+}
+
+.rc-full-width {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rc-btn-primary {
+  width: 260px;
+  margin-top: 2.5rem;
+  padding: 0.85rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #025F51;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rc-btn-primary:hover {
+  background-color: #037968;
+}
+
+.rc-btn-primary:active {
+  transform: scale(0.98);
+}
