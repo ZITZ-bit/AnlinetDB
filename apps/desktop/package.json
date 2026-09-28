@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "package": "electron-builder --win"
+    "package": "electron-builder --win --publish never"
   },
   "dependencies": {
     "boxicons": "^2.1.4",
@@ -56,16 +56,13 @@
     "asar": false,
     "win": {
       "target": ["nsis", "zip"],
-      "icon": "../lib/assets/icons/icon.ico",
-      "signingHashAlgorithms": ["sha256"]
+      "icon": "../lib/assets/icons/icon.ico"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallDirectory": true,
+      "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createUninstaller": true,
       "shortcutName": "AnlinetDB"
-    },
-    "publish": "never"
+    }
   }
 }

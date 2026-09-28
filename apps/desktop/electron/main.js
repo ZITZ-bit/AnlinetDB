@@ -3,7 +3,14 @@ const path = require("path");
 const { spawn } = require("child_process");
 const http = require("http");
 
-require(path.join(__dirname, "..", "..", "lib", "core", "scripts", "windowControls.js"));
+function getLibPath() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, "lib");
+  }
+  return path.join(__dirname, "..", "..", "lib");
+}
+
+require(path.join(getLibPath(), "core", "scripts", "windowControls.js"));
 
 let mainWindow;
 let splash;
@@ -61,6 +68,8 @@ function startNextServer(port) {
 }
 
 function createWindow() {
+  const libPath = getLibPath();
+
   splash = new BrowserWindow({
     width: 120,
     height: 120,
@@ -70,10 +79,10 @@ function createWindow() {
     alwaysOnTop: true,
     hasShadow: false,
     skipTaskbar: true,
-    icon: path.join(__dirname, "..", "..", "lib", "assets", "icons", "icon.ico"),
+    icon: path.join(libPath, "assets", "icons", "icon.ico"),
   });
 
-  splash.loadFile(path.join(__dirname, "..", "..", "lib", "assets", "views", "splash.html"));
+  splash.loadFile(path.join(libPath, "assets", "views", "splash.html"));
 
   mainWindow = new BrowserWindow({
     width: 900,
@@ -81,9 +90,9 @@ function createWindow() {
     autoHideMenuBar: true,
     frame: false,
     show: false,
-    icon: path.join(__dirname, "..", "..", "lib", "assets", "icons", "icon.ico"),
+    icon: path.join(libPath, "assets", "icons", "icon.ico"),
     webPreferences: {
-      preload: path.join(__dirname, "..", "..", "lib", "core", "api", "preload.js"),
+      preload: path.join(libPath, "core", "api", "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
