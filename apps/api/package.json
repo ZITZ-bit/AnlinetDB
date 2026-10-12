@@ -8,6 +8,7 @@
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
+    "dev:develop": "nest start --watch",
     "deploy": "nest deploy",
     "prisma:generate": "prisma generate --config prisma/prisma.config.ts",
     "prisma:push": "prisma db push --config prisma/prisma.config.ts",
