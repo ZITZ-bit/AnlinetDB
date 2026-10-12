@@ -50,6 +50,8 @@ lerna-debug.log*
 .tmp
 
 # Runtime data
+prisma/*.db
+prisma/database/*.db
 pids
 *.pid
 *.seed

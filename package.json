@@ -18,5 +18,8 @@
   },
   "devDependencies": {
     "turbo": "^2.11.4"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true
   }
 }

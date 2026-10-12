@@ -9,6 +9,7 @@ import "../../../styles/registro.css";
 export default function Registro() {
   const router = useRouter();
   const { register, loading, error, clear } = useAuth();
+  const [formError, setFormError] = useState<string | null>(null);
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
@@ -20,7 +21,9 @@ export default function Registro() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clear();
+    setFormError(null);
     if (form.password !== form.confirm) {
+      setFormError('Las contraseñas no coinciden.');
       return;
     }
       try {
@@ -30,7 +33,8 @@ export default function Registro() {
           usuario: form.usuario,
           password: form.password,
         });
-        router.push('/');
+        sessionStorage.setItem('anlinet:registration-success', 'true');
+        router.replace('/');
       } catch {
       // error ya está seteado en el hook
     }
@@ -46,8 +50,11 @@ export default function Registro() {
         <h1>Crear cuenta</h1>
         <p className="subtitle">Registro de usuario</p>
 
-        {error && <p className="error-msg">{error}</p>}
-
+        {(error || formError) && (
+          <p className="registro-notice registro-notice-error" role="alert">
+            {error || formError}
+          </p>
+        )}
         <div className="registro-row">
           <div className="registro-input">
             <input

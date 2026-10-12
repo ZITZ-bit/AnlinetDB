@@ -36,6 +36,22 @@
   width: 100%;
 }
 
+.registro-notice {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.registro-notice-error {
+  border-color: #f1b7b7;
+  background-color: #fff1f1;
+  color: #a12828;
+}
+
 /* Layout */
 
 .registro-row {

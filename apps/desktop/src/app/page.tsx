@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import "../styles/login.css";
@@ -8,7 +8,15 @@ import "../styles/login.css";
 export default function Login() {
   const router = useRouter();
   const { login, loading, error, clear } = useAuth();
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [form, setForm] = useState({ usuario: '', password: '' });
+
+  useEffect(() => {
+    if (sessionStorage.getItem('anlinet:registration-success') === 'true') {
+      sessionStorage.removeItem('anlinet:registration-success');
+      setRegistrationSuccess(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +39,11 @@ export default function Login() {
         <h1>Iniciar sesión</h1>
         <p className="subtitle">Accede a tu cuenta</p>
 
+        {registrationSuccess && (
+          <p className="success-msg" role="status">
+            Cuenta creada correctamente. Inicia sesión para continuar.
+          </p>
+        )}
         {error && <p className="error-msg">{error}</p>}
 
         <div className="input-group">
