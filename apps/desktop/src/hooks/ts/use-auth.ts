@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
-import { apiFetch, getErrorMessage } from "../lib/api";
-import { addToast } from "./use-toast";
+import { apiFetch, getErrorMessage } from "../../lib/api";
+import { addToast } from "../../components/Toast/use-toast";
 
 export interface AuthCredentials {
   usuario: string;

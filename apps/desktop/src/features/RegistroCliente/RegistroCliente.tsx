@@ -1,8 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './RegistroCliente.css';
 import { api, getErrorMessage, type Caja, type Plan, type Zona } from '../../lib/api';
-import { useToast } from '../../hooks/use-toast';
+import { useToast } from '../../components/Toast/use-toast';
 import { periodoActual, vencimientoActual } from '../../lib/mensualidad';
 
 export default function RegistroCliente() {
@@ -20,9 +20,13 @@ export default function RegistroCliente() {
   const [mensualidad, setMensualidad] = useState('');
   const [loading, setLoading] = useState(false);
   const [cargandoCatalogos, setCargandoCatalogos] = useState(true);
-  const { showToast, ToastComponent } = useToast();
+  const { showToast } = useToast();
+  const catalogosCargados = useRef(false);
 
   useEffect(() => {
+    if (catalogosCargados.current) return;
+    catalogosCargados.current = true;
+
     Promise.all([
       api.zonas.getAll().catch(() => []),
       api.planes.getAll().catch(() => []),
@@ -104,7 +108,6 @@ export default function RegistroCliente() {
 
   return (
     <div className="rc-container">
-      <ToastComponent />
       <div className="rc-card">
         <h1>Registro de Cliente</h1>
         <p className="rc-subtitle">
@@ -209,6 +212,7 @@ export default function RegistroCliente() {
               <div className="rc-input-group">
                 <label>
                 <select
+                  className={cajaId ? 'rc-select-has-value' : ''}
                   value={cajaId}
                   onChange={(e) => setCajaId(e.target.value)}
                 >

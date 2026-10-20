@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useSyncExternalStore } from "react";
 
 import { useRouter } from "next/navigation";
 import { HiMenu } from "react-icons/hi";
@@ -8,19 +8,31 @@ interface NavbarProps {
   onSelect: (section: string) => void;
 }
 
+function subscribeToSession(callback: () => void) {
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
+function getUsuarioNombre() {
+  try {
+    const session = JSON.parse(localStorage.getItem("anlinet:session") || "{}");
+    return session.nombre || session.usuario || "Usuario";
+  } catch {
+    return "Usuario";
+  }
+}
+
 export default function Navbar({ onSelect }: NavbarProps) {
   const router = useRouter();
-  const [usuarioNombre] = useState(() => {
-    if (typeof window === "undefined") return "Usuario";
-
-    try {
-      const session = JSON.parse(localStorage.getItem("anlinet:session") || "{}");
-      return session.nombre || session.usuario || "Usuario";
-    } catch {
-      return "Usuario";
-    }
-  });
+  const usuarioNombre = useSyncExternalStore(
+    subscribeToSession,
+    getUsuarioNombre,
+    () => "Usuario",
+  );
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const userTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const userAnchorRef = useRef<HTMLElement | null>(null);
+  const menuAnchorRef = useRef<HTMLDivElement | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -38,6 +50,33 @@ export default function Navbar({ onSelect }: NavbarProps) {
     }, 200);
   };
 
+  const openUserMenu = () => {
+    if (userTimeoutRef.current) {
+      clearTimeout(userTimeoutRef.current);
+      userTimeoutRef.current = null;
+    }
+    setUserMenuOpen(true);
+  };
+
+  const closeUserMenu = () => {
+    userTimeoutRef.current = setTimeout(() => setUserMenuOpen(false), 200);
+  };
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!userAnchorRef.current?.contains(target)) setUserMenuOpen(false);
+      if (!menuAnchorRef.current?.contains(target)) setMenuOpen(false);
+    };
+
+    document.addEventListener("click", closeOnOutsideClick);
+    return () => {
+      document.removeEventListener("click", closeOnOutsideClick);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (userTimeoutRef.current) clearTimeout(userTimeoutRef.current);
+    };
+  }, []);
+
   const handleSelect = (section: string) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -50,20 +89,26 @@ export default function Navbar({ onSelect }: NavbarProps) {
   return (
     <nav className="dashboard-nav">
       <div className="dashboard-nav-layout">
-        <section className="dashboard-nav-user">
+        <section
+          ref={userAnchorRef}
+          className="dashboard-nav-user"
+          onMouseEnter={openUserMenu}
+          onMouseLeave={closeUserMenu}
+        >
           <button
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
             className="dashboard-user-button"
+            aria-expanded={userMenuOpen}
           >
             {usuarioNombre}
           </button>
 
           {userMenuOpen && (
-            <div className="dashboard-user-menu">
+            <div className="dashboard-dropdown dashboard-user-dropdown">
               <button
                 onClick={() => {
                   localStorage.removeItem("anlinet:session");
                   localStorage.removeItem("token");
+                  setUserMenuOpen(false);
                   router.push("/");
                 }}
                 className="dashboard-logout-button"
@@ -79,21 +124,18 @@ export default function Navbar({ onSelect }: NavbarProps) {
             Inicio
           </button>
 
-          <button type="button" onClick={() => onSelect("RegistroCliente")} className="dashboard-nav-link">
-            Registrar Cliente
-          </button>
-
-          <button type="button" onClick={() => onSelect("CrearCajas")} className="dashboard-nav-link">
-            Crear Caja
-          </button>
-
           <button type="button" onClick={() => onSelect("Cajas")} className="dashboard-nav-link">
             Ver Cajas
+          </button>
+
+          <button type="button" onClick={() => onSelect("Estadisticas")} className="dashboard-nav-link">
+            Estadísticas
           </button>
         </section>
 
         <section className="dashboard-nav-actions">
           <div
+            ref={menuAnchorRef}
             className="dashboard-menu-anchor"
             onMouseEnter={openMenu}
             onMouseLeave={closeMenu}
@@ -105,6 +147,18 @@ export default function Navbar({ onSelect }: NavbarProps) {
             {menuOpen && (
               <div className="dashboard-dropdown">
                 <div>
+                  <button
+                    type="button"
+                    onClick={() => handleSelect("RegistroCliente")}
+                  >
+                    Registrar Cliente
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSelect("CrearCajas")}
+                  >
+                    Crear Caja
+                  </button>
                   <button
                     type="button"
                     onClick={() => handleSelect("CrearPlanMensualidad")}

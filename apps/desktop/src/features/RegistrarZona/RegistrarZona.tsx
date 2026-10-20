@@ -2,13 +2,13 @@
 import { useState } from 'react';
 import './RegistrarZona.css';
 import { api, getErrorMessage } from '../../lib/api';
-import { useToast } from '../../hooks/use-toast';
+import { useToast } from '../../components/Toast/use-toast';
 
 export default function RegistrarZona() {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [loading, setLoading] = useState(false);
-  const { showToast, ToastComponent } = useToast();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +39,6 @@ export default function RegistrarZona() {
 
   return (
     <div className="rz-container">
-      <ToastComponent />
       <div className="rz-card">
         <h1>Registrar Zona</h1>
         <p className="rz-subtitle">

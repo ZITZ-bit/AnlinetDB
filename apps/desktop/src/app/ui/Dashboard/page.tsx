@@ -5,6 +5,7 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Tabla from "@/components/Tabla";
 import VerCajas from "@/components/VerCajas";
+import Estadisticas from "@/components/Estadisticas";
 
 import RegistroCliente from "@/features/RegistroCliente/RegistroCliente";
 import CrearCajas from "@/features/CrearCajas/CrearCajas";
@@ -28,6 +29,7 @@ export default function Dashboard() {
         {activeSection === "RegistroCliente" && <RegistroCliente />}
         {activeSection === "CrearCajas" && <CrearCajas />}
         {activeSection === "Cajas" && <VerCajas />}
+        {activeSection === "Estadisticas" && <Estadisticas />}
         {activeSection === "CrearPlanMensualidad" && <PlanesMensualidades />}
         {activeSection === "RegistrarZona" && <RegistrarZona />}
       </main>

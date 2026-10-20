@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback, useEffect, useRef, memo } from 'react';
+import { useCallback, useSyncExternalStore, memo } from 'react';
 
 export interface Toast {
   id: string;
@@ -7,13 +7,23 @@ export interface Toast {
   type: 'success' | 'error' | 'info';
 }
 
-type Listener = (toasts: Toast[]) => void;
+type Listener = () => void;
 
 let toasts: Toast[] = [];
 const listeners = new Set<Listener>();
+const emptyToasts: Toast[] = [];
 
 function notify() {
-  listeners.forEach((cb) => cb(toasts));
+  listeners.forEach((callback) => callback());
+}
+
+function subscribe(callback: Listener) {
+  listeners.add(callback);
+  return () => listeners.delete(callback);
+}
+
+function getSnapshot() {
+  return toasts;
 }
 
 export function addToast(message: string, type: 'success' | 'error' | 'info' = 'info') {
@@ -21,26 +31,16 @@ export function addToast(message: string, type: 'success' | 'error' | 'info' = '
   const item: Toast = { id, message, type };
   toasts = [...toasts, item];
   notify();
-  setTimeout(() => {
-    removeToast(id);
-  }, 4500);
+  setTimeout(() => removeToast(id), 4500);
 }
 
 export function removeToast(id: string) {
-  toasts = toasts.filter((t) => t.id !== id);
+  toasts = toasts.filter((toast) => toast.id !== id);
   notify();
 }
 
 export function useToast() {
-  const [current, setCurrent] = useState<Toast[]>(toasts);
-
-  useEffect(() => {
-    listeners.add(setCurrent);
-    setCurrent(toasts);
-    return () => {
-      listeners.delete(setCurrent);
-    };
-  }, []);
+  const current = useSyncExternalStore(subscribe, getSnapshot, () => emptyToasts);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     addToast(message, type);

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import './PlanesMensualidades.css';
 import { api, getErrorMessage } from '../../lib/api';
-import { useToast } from '../../hooks/use-toast';
+import { useToast } from '../../components/Toast/use-toast';
 
 export default function PlanesMensualidades() {
   const [nombre, setNombre] = useState('');
@@ -10,7 +10,7 @@ export default function PlanesMensualidades() {
   const [precio, setPrecio] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [loading, setLoading] = useState(false);
-  const { showToast, ToastComponent } = useToast();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +44,6 @@ export default function PlanesMensualidades() {
 
   return (
     <div className="pm-container">
-      <ToastComponent />
       <div className="pm-card">
         <h1>Planes y Mensualidades</h1>
         <p className="pm-subtitle">

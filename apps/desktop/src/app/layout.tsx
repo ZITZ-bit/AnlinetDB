@@ -1,7 +1,7 @@
 import "./globals.css";
 import TitleBar from "@/components/TitleBar";
 import SessionExpiredHandler from "@/components/SessionExpiredHandler";
-import { ToastProvider } from "@/components/ToastProvider";
+import { ToastProvider } from "@/components/Toast/ToastProvider";
 
 export const metadata = {
   title: "Anlinet",

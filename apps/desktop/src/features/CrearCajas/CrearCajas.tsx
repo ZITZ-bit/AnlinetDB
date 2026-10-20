@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import './CrearCajas.css';
 import { api, getErrorMessage, type Zona } from '../../lib/api';
-import { useToast } from '../../hooks/use-toast';
+import { useToast } from '../../components/Toast/use-toast';
 
 export default function CrearCajas() {
   const [codigoCaja, setCodigoCaja] = useState('');
@@ -15,7 +15,7 @@ export default function CrearCajas() {
   const [observaciones, setObservaciones] = useState('');
   const [zonas, setZonas] = useState<Zona[]>([]);
   const [loading, setLoading] = useState(false);
-  const { showToast, ToastComponent } = useToast();
+  const { showToast } = useToast();
 
   useEffect(() => {
     api.zonas.getAll().then(setZonas).catch(() => setZonas([]));
@@ -59,7 +59,6 @@ export default function CrearCajas() {
 
   return (
     <div className="cx-wrapper">
-      <ToastComponent />
       <div className="cx-panel">
         <h1>Registrar Caja</h1>
         <p className="cx-description">

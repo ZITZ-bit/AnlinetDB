@@ -10,6 +10,7 @@ export function useMesesTabla() {
   const [mesesSeleccionados, setMesesSeleccionados] = useState([...TablaMeses])
 
   const toggleMenu = () => setMostrarMenu(!mostrarMenu)
+  const closeMenu = () => setMostrarMenu(false)
 
   const handleCheckboxChange = (mes) => {
     setMesesSeleccionados(prev =>
@@ -22,6 +23,7 @@ export function useMesesTabla() {
   return {
     mostrarMenu,
     toggleMenu,
+    closeMenu,
     mesesSeleccionados,
     setMesesSeleccionados,
     handleCheckboxChange

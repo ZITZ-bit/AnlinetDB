@@ -206,8 +206,13 @@ export const api = {
       monto: number;
       periodo: string;
       fechaVencimiento: string;
+      estado?: string;
     }) => apiFetch<Mensualidad>('/mensualidades', {
       method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    update: (id: number, data: { estado: string }) => apiFetch<Mensualidad>(`/mensualidades/${id}`, {
+      method: 'PATCH',
       body: JSON.stringify(data),
     }),
   },

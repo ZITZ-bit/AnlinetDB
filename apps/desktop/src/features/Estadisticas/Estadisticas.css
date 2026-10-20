@@ -1,0 +1,94 @@
+.estadisticas-view {
+  width: 100%;
+  max-width: 1480px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  background-color: #f3f7f5;
+  background-image: linear-gradient(#e5eeea 1px, transparent 1px), linear-gradient(90deg, #e5eeea 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.estadisticas-heading {
+  max-width: 42rem;
+  margin: 0 0 2rem;
+  padding: 0 0 1.25rem;
+  border-bottom: 1px solid #d7e2de;
+}
+
+.estadisticas-kicker {
+  color: #657570;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.estadisticas-heading h1 {
+  margin: 0.55rem 0 0;
+  color: #18342f;
+  font-size: 1.8rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.estadisticas-heading p {
+  margin: 0.5rem 0 0;
+  color: #657570;
+  font-size: 0.9rem;
+}
+
+.estadisticas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 1px;
+  max-width: 1100px;
+  background: #d7e2de;
+  border: 1px solid #d7e2de;
+}
+
+.estadisticas-metric {
+  min-height: 10rem;
+  padding: 1.25rem;
+  background: #fff;
+  animation: estadisticas-enter 320ms ease-out both;
+}
+
+.estadisticas-metric-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #657570;
+  font-size: 0.72rem;
+}
+
+.estadisticas-metric-topline i {
+  color: #03896b;
+  font-size: 1.2rem;
+}
+
+.estadisticas-metric strong {
+  display: block;
+  margin-top: 1.4rem;
+  color: #025f51;
+  font-size: 2rem;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.estadisticas-metric p {
+  margin: 0.55rem 0 0;
+  color: #657570;
+  font-size: 0.82rem;
+}
+
+@keyframes estadisticas-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .estadisticas-view { padding: 1.1rem; }
+  .estadisticas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .estadisticas-metric { min-height: 8.5rem; padding: 0.9rem; }
+  .estadisticas-metric strong { font-size: 1.65rem; }
+}

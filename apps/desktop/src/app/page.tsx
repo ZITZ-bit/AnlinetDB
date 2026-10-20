@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
-import { addToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/ts/use-auth';
+import { addToast } from '@/components/Toast/use-toast';
 import "../styles/login.css";
 
 export default function Login() {
