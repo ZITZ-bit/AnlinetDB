@@ -45,7 +45,8 @@
 
 .dashboard-nav-user {
   position: relative;
-  padding-left: 1.5rem;
+  flex: 0 0 auto;
+  margin-left: 1.5rem;
 }
 
 .dashboard-user-button,
@@ -175,7 +176,7 @@
 
 .dashboard-user-dropdown {
   right: auto;
-  left: 1.5rem;
+  left: 0;
 }
 
 .dashboard-dropdown button {
@@ -498,6 +499,14 @@
 .dashboard-table tbody tr:nth-child(5) { animation-delay: 100ms; }
 .dashboard-table tbody tr:nth-child(6) { animation-delay: 125ms; }
 
+.dashboard-table td.dashboard-table-empty {
+  padding: 1.6rem 1rem;
+  color: #657570;
+  font-size: 0.84rem;
+  text-align: center;
+  white-space: normal;
+}
+
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
@@ -596,18 +605,35 @@
   color: #a64d0a;
 }
 
-.dashboard-month-cell {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2rem;
+.dashboard-table td.dashboard-month-td {
+  padding: 0.15rem 0.4rem;
 }
 
-.dashboard-month-empty {
+.dashboard-month-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 2.1rem;
+  box-sizing: border-box;
+  padding-right: 1.35rem;
+}
+
+.dashboard-month-content {
+  min-width: 0;
+}
+
+.dashboard-month-date {
+  display: inline-block;
   color: var(--dashboard-muted);
+  font-size: inherit;
 }
 
 .dashboard-month-state-trigger {
   display: inline-grid;
+  position: absolute;
+  right: 0;
+  bottom: 0;
   width: 1.45rem;
   height: 1.45rem;
   place-items: center;
@@ -687,6 +713,181 @@
 .dashboard-state-icon[data-state="no_pago"] { color: #c23842; }
 .dashboard-state-icon[data-state="nuevo_ingreso"] { color: #7654bd; }
 .dashboard-state-icon[data-state="dsn"] { color: #d46a16; }
+
+.dashboard-label-summary {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.65rem;
+}
+
+.dashboard-label-summary-dock {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  max-width: calc(100vw - 2rem);
+}
+
+.dashboard-label-summary-trigger {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid #04a777;
+  border-radius: 50%;
+  background: var(--dashboard-green);
+  box-shadow: 0 5px 16px rgb(17 44 37 / 22%);
+  color: #fff;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.dashboard-label-summary-trigger:hover {
+  transform: translateY(-2px);
+  background: var(--dashboard-green-dark);
+}
+
+.dashboard-label-summary-trigger i {
+  font-size: 1.05rem;
+}
+
+.dashboard-label-selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.1rem;
+  max-width: min(14rem, calc(100vw - 5rem));
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--dashboard-line);
+  background: #fff;
+  color: #344a44;
+  box-shadow: 0 3px 10px rgb(17 44 37 / 12%);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.dashboard-label-selected-chip > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-label-selected-chip .dashboard-label-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+}
+
+.dashboard-label-selected-chip strong {
+  min-width: 1rem;
+  color: var(--dashboard-green);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.dashboard-label-summary-panel {
+  width: min(16rem, calc(100vw - 2rem));
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--dashboard-line);
+  border-top: 3px solid var(--dashboard-green-light);
+  background: #fff;
+  box-shadow: 0 12px 32px rgb(17 44 37 / 18%);
+  animation: dashboard-menu-enter 160ms ease-out both;
+}
+
+.dashboard-label-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--dashboard-line);
+}
+
+.dashboard-label-summary-header h2 {
+  margin: 0;
+  color: var(--dashboard-ink);
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.dashboard-label-summary-close {
+  display: grid;
+  width: 1.55rem;
+  height: 1.55rem;
+  place-items: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--dashboard-muted);
+  cursor: pointer;
+}
+
+.dashboard-label-summary-close:hover {
+  border-color: var(--dashboard-line);
+  background: #f5f8f6;
+  color: var(--dashboard-green);
+}
+
+.dashboard-label-summary-close i {
+  font-size: 1.15rem;
+}
+
+.dashboard-label-summary-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0.35rem 0 0;
+  list-style: none;
+}
+
+.dashboard-label-summary-list li,
+.dashboard-label-summary-name {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-label-summary-list li {
+  justify-content: space-between;
+  min-height: 1.65rem;
+  color: #344a44;
+  font-size: 0.75rem;
+}
+
+.dashboard-label-summary-list li.dashboard-label-summary-total {
+  min-height: 1.8rem;
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--dashboard-line);
+  font-weight: 650;
+}
+
+.dashboard-label-summary-name {
+  gap: 0.6rem;
+}
+
+.dashboard-label-dot {
+  width: 0.62rem;
+  height: 0.62rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #8a7860;
+}
+
+.dashboard-label-dot[data-state="transferencia"] { background: #2877b8; }
+.dashboard-label-dot[data-state="divisa"] { background: #218362; }
+.dashboard-label-dot[data-state="no_pago"] { background: #c23842; }
+.dashboard-label-dot[data-state="nuevo_ingreso"] { background: #7654bd; }
+.dashboard-label-dot[data-state="dsn"] { background: #d46a16; }
+
+.dashboard-label-summary-list strong {
+  min-width: 1.8rem;
+  color: var(--dashboard-green);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
 
 .dashboard-state-option[data-state="pendiente_manual"]:hover { background: #f2ede5; color: #725e43; }
 .dashboard-state-option[data-state="transferencia"]:hover { background: #eaf4fd; color: #205c91; }
@@ -817,7 +1018,7 @@
   .dashboard-nav-user {
     grid-column: 1;
     grid-row: 1;
-    padding-left: 0.8rem;
+    margin-left: 0.8rem;
   }
 
   .dashboard-user-menu {
@@ -825,7 +1026,7 @@
   }
 
   .dashboard-user-dropdown {
-    left: 0.8rem;
+    left: 0;
   }
 
   .dashboard-nav-links {

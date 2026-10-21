@@ -32,8 +32,7 @@ export interface Caja {
 
 export interface Cliente {
   id: number;
-  nombre: string;
-  apellido: string;
+  usuario: string;
   cedula: string | null;
   telefono: string | null;
   direccion: string;
@@ -48,14 +47,16 @@ export interface Cliente {
   caja?: Caja | null;
 }
 
-export interface Mensualidad {
+export interface Corte {
   id: number;
   clienteId: number;
   monto: number;
   periodo: string;
-  fechaVencimiento: string;
+  fechaVencimiento: string | null;
+  fechaCorte: string | null;
   fechaPago: string | null;
   estado: string;
+  revisado: boolean;
   observacion: string | null;
 }
 
@@ -189,8 +190,7 @@ export const api = {
   clientes: {
     getAll: () => apiFetch<Cliente[]>('/clientes'),
     create: (data: {
-      nombre: string;
-      apellido: string;
+      usuario: string;
       cedula?: string;
       telefono?: string;
       direccion: string;
@@ -199,19 +199,19 @@ export const api = {
       cajaId?: number;
     }) => apiFetch<Cliente>('/clientes', { method: 'POST', body: JSON.stringify(data) }),
   },
-  mensualidades: {
-    getAll: () => apiFetch<Mensualidad[]>('/mensualidades'),
+  cortes: {
+    getAll: () => apiFetch<Corte[]>('/cortes'),
     create: (data: {
       clienteId: number;
       monto: number;
       periodo: string;
-      fechaVencimiento: string;
+      fechaVencimiento?: string | null;
       estado?: string;
-    }) => apiFetch<Mensualidad>('/mensualidades', {
+    }) => apiFetch<Corte>('/cortes', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-    update: (id: number, data: { estado: string }) => apiFetch<Mensualidad>(`/mensualidades/${id}`, {
+    update: (id: number, data: { estado: string }) => apiFetch<Corte>(`/cortes/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),

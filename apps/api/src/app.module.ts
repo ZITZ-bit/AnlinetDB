@@ -6,12 +6,12 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PlanesModule } from './planes/planes.module';
 import { ZonasModule } from './zona/zona.module';
-import { MensualidadModule } from './mensualidad/mensualidad.module';
+import { CorteModule } from './corte/corte.module';
 import { ClientesModule } from './cliente/cliente.module';
 import { CajaModule } from './caja/caja.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, PlanesModule, ZonasModule, MensualidadModule, ClientesModule, CajaModule],
+  imports: [PrismaModule, UsersModule, AuthModule, PlanesModule, ZonasModule, CorteModule, ClientesModule, CajaModule],
   controllers: [AppController],
   providers: [AppService],
 })

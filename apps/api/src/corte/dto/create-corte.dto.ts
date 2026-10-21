@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class CreateMensualidadDto {
+export class CreateCorteDto {
   @IsNumber()
   clienteId: number;
 
@@ -20,9 +20,10 @@ export class CreateMensualidadDto {
   @MaxLength(50)
   periodo: string;
 
+  @IsOptional()
   @Type(() => Date)
   @IsDate()
-  fechaVencimiento: Date;
+  fechaVencimiento?: Date;
 
   @IsOptional()
   @Type(() => Date)

@@ -6,8 +6,9 @@ import "@/app/globals.css"
 import { TablaMeses, useMesesTabla } from "../hooks/js/tabla"
 import { useEffect, useMemo, useRef, useState, ReactNode, RefObject } from "react"
 import { createPortal } from "react-dom"
-import { mesDePeriodo } from "../lib/mensualidad"
-import { api, getErrorMessage, type Cliente, type Mensualidad } from '../lib/api'
+import { mesDePeriodo } from "../lib/corte"
+import { api, getErrorMessage, type Cliente, type Corte } from '../lib/api'
+import { coincideUsuarioOCedula, coincideZonaOCaja, normalizar } from '../lib/busqueda'
 import { addToast } from "./Toast/use-toast"
 
 const etiquetasEstado = [
@@ -60,19 +61,22 @@ function DropdownMenu({ children, buttonRef, onClose }: DropdownMenuProps) {
   )
 }
 
-interface EstadoMensualidadCellProps {
+interface EstadoCorteCellProps {
   cliente: Cliente
   mes: number
-  mensualidad?: Mensualidad
-  onSave: (mensualidad: Mensualidad) => void
+  corte?: Corte
+  onSave: (corte: Corte) => void
 }
 
-function EstadoMensualidadCell({ cliente, mes, mensualidad, onSave }: EstadoMensualidadCellProps) {
+function EstadoCorteCell({ cliente, mes, corte, onSave }: EstadoCorteCellProps) {
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [guardando, setGuardando] = useState(false)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
-  const estado = mensualidad?.estado || "pendiente"
+  const estado = corte?.estado || "pendiente"
   const etiqueta = etiquetasEstado.find((item) => item.value === estado)
+  const fechaVencimiento = corte?.fechaVencimiento
+    ? new Date(`${corte.fechaVencimiento.slice(0, 10)}T00:00:00`).toLocaleDateString("es-ES")
+    : null
 
   const guardarEstado = async (estadoSeleccionado: string) => {
     if (guardando) return
@@ -82,18 +86,17 @@ function EstadoMensualidadCell({ cliente, mes, mensualidad, onSave }: EstadoMens
       const fecha = new Date()
       const anio = fecha.getFullYear()
       const periodo = `${anio}-${String(mes).padStart(2, "0")}`
-      const vencimiento = new Date(anio, mes, 0)
-      const mensualidadGuardada = mensualidad
-        ? await api.mensualidades.update(mensualidad.id, { estado: estadoSeleccionado })
-        : await api.mensualidades.create({
+      const corteGuardado = corte
+        ? await api.cortes.update(corte.id, { estado: estadoSeleccionado })
+        : await api.cortes.create({
             clienteId: cliente.id,
             monto: cliente.plan?.precio ?? 0,
             periodo,
-            fechaVencimiento: vencimiento.toISOString(),
+            fechaVencimiento: null,
             estado: estadoSeleccionado,
           })
 
-      onSave(mensualidadGuardada)
+      onSave(corteGuardado)
       setMenuAbierto(false)
     } catch (error) {
       addToast(getErrorMessage(error, "No se pudo actualizar la etiqueta"), "error")
@@ -103,7 +106,7 @@ function EstadoMensualidadCell({ cliente, mes, mensualidad, onSave }: EstadoMens
   }
 
   const quitarEtiqueta = async () => {
-    if (!mensualidad) {
+    if (!corte) {
       setMenuAbierto(false)
       return
     }
@@ -112,8 +115,8 @@ function EstadoMensualidadCell({ cliente, mes, mensualidad, onSave }: EstadoMens
     setGuardando(true)
 
     try {
-      const mensualidadActualizada = await api.mensualidades.update(mensualidad.id, { estado: "pendiente" })
-      onSave(mensualidadActualizada)
+      const corteActualizado = await api.cortes.update(corte.id, { estado: "pendiente" })
+      onSave(corteActualizado)
       setMenuAbierto(false)
     } catch (error) {
       addToast(getErrorMessage(error, "No se pudo quitar la etiqueta"), "error")
@@ -124,13 +127,17 @@ function EstadoMensualidadCell({ cliente, mes, mensualidad, onSave }: EstadoMens
 
   return (
     <div className="dashboard-month-cell">
-      {mensualidad && estado !== "pendiente" ? (
-        <span className="dashboard-box-status" data-state={estado}>
-          {etiqueta?.label ?? estado}
-        </span>
-      ) : !mensualidad ? (
-        <span className="dashboard-month-empty">-</span>
-      ) : null}
+      <div className="dashboard-month-content">
+        {corte && estado !== "pendiente" ? (
+          <span className="dashboard-box-status" data-state={estado}>
+            {etiqueta?.label ?? estado}
+          </span>
+        ) : corte && fechaVencimiento ? (
+          <time className="dashboard-month-date" dateTime={corte.fechaVencimiento ?? undefined}>
+            {fechaVencimiento}
+          </time>
+        ) : null}
+      </div>
       <button
         ref={buttonRef}
         type="button"
@@ -177,29 +184,32 @@ function EstadoMensualidadCell({ cliente, mes, mensualidad, onSave }: EstadoMens
 function Tabla() {
   const { mostrarMenu, toggleMenu, closeMenu, mesesSeleccionados, setMesesSeleccionados, handleCheckboxChange } = useMesesTabla()
   const [mostrarFiltroEtiquetas, setMostrarFiltroEtiquetas] = useState(false)
+  const [mostrarResumenEtiquetas, setMostrarResumenEtiquetas] = useState(false)
   const [etiquetasSeleccionadas, setEtiquetasSeleccionadas] = useState(etiquetasEstado.map(({ value }) => value))
+  const [busquedaUsuario, setBusquedaUsuario] = useState("")
+  const [busquedaZonaCaja, setBusquedaZonaCaja] = useState("")
   const [clientes, setClientes] = useState<Cliente[]>([])
-  const [mensualidades, setMensualidades] = useState<Mensualidad[]>([])
+  const [cortes, setCortes] = useState<Corte[]>([])
 
-  const guardarMensualidad = (actualizada: Mensualidad) => {
-    setMensualidades((actuales) => [
-      ...actuales.filter((mensualidad) => mensualidad.id !== actualizada.id),
-      actualizada,
+  const guardarCorte = (actualizado: Corte) => {
+    setCortes((actuales) => [
+      ...actuales.filter((corte) => corte.id !== actualizado.id),
+      actualizado,
     ])
   }
 
   useEffect(() => {
     api.clientes.getAll().then(setClientes).catch(() => setClientes([]))
-    api.mensualidades.getAll().then(setMensualidades).catch(() => setMensualidades([]))
+    api.cortes.getAll().then(setCortes).catch(() => setCortes([]))
   }, [])
 
-  const mensualidadesPorCliente = useMemo(() => {
-    const mapa = new Map<number, Mensualidad[]>()
+  const cortesPorCliente = useMemo(() => {
+    const mapa = new Map<number, Corte[]>()
 
-    for (const mensualidad of mensualidades) {
-      const lista = mapa.get(mensualidad.clienteId) ?? []
-      lista.push(mensualidad)
-      mapa.set(mensualidad.clienteId, lista)
+    for (const corte of cortes) {
+      const lista = mapa.get(corte.clienteId) ?? []
+      lista.push(corte)
+      mapa.set(corte.clienteId, lista)
     }
 
     for (const lista of mapa.values()) {
@@ -207,9 +217,24 @@ function Tabla() {
     }
 
     return mapa
-  }, [mensualidades])
+  }, [cortes])
 
-  const columnasFijas = ["Nombre", "Apellido", "Cédula", "Zona", "Caja", "Mensualidad"]
+  const resumenEtiquetas = useMemo(
+    () => etiquetasEstado.map((etiqueta) => ({
+      ...etiqueta,
+      cantidad: new Set(
+        cortes
+          .filter((corte) => corte.estado === etiqueta.value)
+          .map((corte) => corte.clienteId),
+      ).size,
+    })),
+    [cortes],
+  )
+  const etiquetasActivas = etiquetasSeleccionadas.length === etiquetasEstado.length
+    ? []
+    : resumenEtiquetas.filter((etiqueta) => etiquetasSeleccionadas.includes(etiqueta.value))
+
+  const columnasFijas = ["Cédula", "Usuario", "Zona", "Caja", "Corte"]
   const mesesAMostrar = mesesSeleccionados
 
   const monthFilterButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -223,24 +248,32 @@ function Tabla() {
     )
   }
 
-  const mensualidadDelMes = (clienteId: number, mes: number) =>
-    (mensualidadesPorCliente.get(clienteId) ?? []).find(
-      (mensualidad) => mesDePeriodo(mensualidad.periodo) === mes,
+  const corteDelMes = (clienteId: number, mes: number) =>
+    (cortesPorCliente.get(clienteId) ?? []).find(
+      (corte) => mesDePeriodo(corte.periodo) === mes,
     )
 
-  const montoMensual = (cliente: Cliente) => {
-    const lista = mensualidadesPorCliente.get(cliente.id) ?? []
-    if (lista.length > 0) return lista[0].monto
-    if (cliente.plan?.precio != null) return cliente.plan.precio
-    return "-"
+  const fechaCorteCliente = (cliente: Cliente) => {
+    const lista = cortesPorCliente.get(cliente.id) ?? []
+    const corte = lista.find((item) => item.fechaCorte)
+    if (!corte?.fechaCorte) return "-"
+    return new Date(corte.fechaCorte).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+    })
   }
 
+  const consultaUsuario = normalizar(busquedaUsuario)
+  const consultaZonaCaja = normalizar(busquedaZonaCaja)
+
   const clientesFiltrados = clientes.filter((cliente) => {
+    if (consultaUsuario && !coincideUsuarioOCedula(cliente, consultaUsuario)) return false
+    if (consultaZonaCaja && !coincideZonaOCaja(cliente, consultaZonaCaja)) return false
     if (etiquetasSeleccionadas.length === etiquetasEstado.length) return true
     return mesesAMostrar.some((mes) => {
-      const mensualidad = mensualidadDelMes(cliente.id, TablaMeses.indexOf(mes) + 1)
-      if (!mensualidad) return false
-      const estado = mensualidad.estado === "pendiente" ? "pendiente_manual" : mensualidad.estado
+      const corte = corteDelMes(cliente.id, TablaMeses.indexOf(mes) + 1)
+      if (!corte) return false
+      const estado = corte.estado === "pendiente" ? "pendiente_manual" : corte.estado
       return etiquetasSeleccionadas.includes(estado)
     })
   })
@@ -316,14 +349,18 @@ function Tabla() {
           <input
             className="dashboard-table-search"
             type="search"
-            aria-label="Buscar cliente por nombre o apellido"
-            placeholder="Buscar por nombre o apellido..."
+            aria-label="Buscar cliente por usuario o cédula"
+            placeholder="Buscar por usuario o cédula..."
+            value={busquedaUsuario}
+            onChange={(e) => setBusquedaUsuario(e.target.value)}
           />
           <input
             className="dashboard-table-search"
             type="search"
             aria-label="Buscar cliente por zona o caja"
             placeholder="Buscar por zona o caja..."
+            value={busquedaZonaCaja}
+            onChange={(e) => setBusquedaZonaCaja(e.target.value)}
           />
         </div>
 
@@ -350,32 +387,97 @@ function Tabla() {
             <tbody>
               {clientesFiltrados.map((c) => (
                 <tr key={c.id}>
-                  <td>{c.nombre}</td>
-                  <td>{c.apellido}</td>
                   <td>{c.cedula || '-'}</td>
+                  <td>{c.usuario}</td>
                   <td>{c.zona?.nombre || '-'}</td>
                   <td>{c.caja?.codigoCaja || '-'}</td>
-                  <td>{montoMensual(c)}</td>
+                  <td>{fechaCorteCliente(c)}</td>
                   {mesesAMostrar.map((mes) => {
                     const numeroMes = TablaMeses.indexOf(mes) + 1
-                    const mensualidad = mensualidadDelMes(c.id, numeroMes)
+                    const corte = corteDelMes(c.id, numeroMes)
 
                     return (
-                      <td key={mes}>
-                        <EstadoMensualidadCell
+                      <td key={mes} className="dashboard-month-td">
+                        <EstadoCorteCell
                           cliente={c}
                           mes={numeroMes}
-                          mensualidad={mensualidad}
-                          onSave={guardarMensualidad}
+                          corte={corte}
+                          onSave={guardarCorte}
                         />
                       </td>
                     )
                   })}
                 </tr>
               ))}
+              {clientesFiltrados.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={columnasFijas.length + mesesAMostrar.length}
+                    className="dashboard-table-empty"
+                  >
+                    No se encontraron clientes
+                  </td>
+                </tr>
+              )}
             </tbody>
 
           </table>
+        </div>
+
+        <div className="dashboard-label-summary">
+          {mostrarResumenEtiquetas && (
+            <section
+              id="dashboard-label-summary-panel"
+              className="dashboard-label-summary-panel"
+              aria-label="Resumen de usuarios por etiqueta"
+            >
+              <header className="dashboard-label-summary-header">
+                <h2>Usuarios por etiqueta</h2>
+                <button
+                  type="button"
+                  className="dashboard-label-summary-close"
+                  aria-label="Cerrar resumen de etiquetas"
+                  onClick={() => setMostrarResumenEtiquetas(false)}
+                >
+                  <i className="bx bx-x" aria-hidden="true" />
+                </button>
+              </header>
+              <ul className="dashboard-label-summary-list">
+                {resumenEtiquetas.map((etiqueta) => (
+                  <li key={etiqueta.value}>
+                    <span className="dashboard-label-summary-name">
+                      <span className="dashboard-label-dot" data-state={etiqueta.value} aria-hidden="true" />
+                      {etiqueta.label}
+                    </span>
+                    <strong>{etiqueta.cantidad}</strong>
+                  </li>
+                ))}
+                <li className="dashboard-label-summary-total">
+                  <span>Total de clientes</span>
+                  <strong>{clientes.length}</strong>
+                </li>
+              </ul>
+            </section>
+          )}
+          <div className="dashboard-label-summary-dock">
+            {etiquetasActivas.map((etiqueta) => (
+              <span key={etiqueta.value} className="dashboard-label-selected-chip">
+                <span className="dashboard-label-dot" data-state={etiqueta.value} aria-hidden="true" />
+                <span>{etiqueta.label}</span>
+                <strong>{etiqueta.cantidad}</strong>
+              </span>
+            ))}
+            <button
+              type="button"
+              className="dashboard-label-summary-trigger"
+              aria-label={mostrarResumenEtiquetas ? "Cerrar resumen de etiquetas" : "Ver usuarios por etiqueta"}
+              aria-expanded={mostrarResumenEtiquetas}
+              aria-controls="dashboard-label-summary-panel"
+              onClick={() => setMostrarResumenEtiquetas((abierto) => !abierto)}
+            >
+              <i className={mostrarResumenEtiquetas ? "bx bx-x" : "bx bx-purchase-tag"} aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
       </div>

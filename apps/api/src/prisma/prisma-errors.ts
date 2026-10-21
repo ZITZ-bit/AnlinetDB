@@ -4,6 +4,7 @@ import { Prisma } from '../generated/prisma/client';
 const FRIENDLY_FIELDS: Record<string, string> = {
   nombre: 'nombre',
   usuarioId: 'nombre',
+  propietarioId: 'nombre',
   codigoCaja: 'código de caja',
   cedula: 'cédula',
   usuario: 'usuario',
@@ -21,7 +22,9 @@ function extractFields(error: Prisma.PrismaClientKnownRequestError): string[] {
 }
 
 function describeFields(fields: string[], entity: string): string {
-  const relevant = fields.filter((field) => field !== 'usuarioId');
+  const relevant = fields.filter(
+    (field) => field !== 'usuarioId' && field !== 'propietarioId',
+  );
 
   if (relevant.length === 0) return '';
 

@@ -1,10 +1,10 @@
 'use client';
 import { useState } from 'react';
-import './PlanesMensualidades.css';
+import './PlanesCortes.css';
 import { api, getErrorMessage } from '../../lib/api';
 import { useToast } from '../../components/Toast/use-toast';
 
-export default function PlanesMensualidades() {
+export default function PlanesCortes() {
   const [nombre, setNombre] = useState('');
   const [velocidad, setVelocidad] = useState('');
   const [precio, setPrecio] = useState('');
@@ -45,9 +45,9 @@ export default function PlanesMensualidades() {
   return (
     <div className="pm-container">
       <div className="pm-card">
-        <h1>Planes y Mensualidades</h1>
+        <h1>Planes y Cortes</h1>
         <p className="pm-subtitle">
-          Configuración de planes de fibra óptica y valores de mensualidad
+          Configuración de planes de fibra óptica y valores de corte
         </p>
 
         <form className="pm-form-grid" onSubmit={handleSubmit}>
@@ -89,7 +89,7 @@ export default function PlanesMensualidades() {
                   value={precio}
                   onChange={(e) => setPrecio(e.target.value)}
                 />
-                <span>Precio Mensual</span>
+                <span>Precio de Corte</span>
                 </label>
               </div>
             </div>

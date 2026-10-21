@@ -6,7 +6,7 @@ export interface TotalesEstadisticas {
   clientes: number;
   cajas: number;
   zonas: number;
-  mensualidades: number;
+  cortes: number;
 }
 
 interface EstadisticasVistaProps {
@@ -18,7 +18,7 @@ const metricas: { key: keyof TotalesEstadisticas; label: string; icon: string }[
   { key: 'clientes', label: 'Clientes registrados', icon: 'bx-user' },
   { key: 'cajas', label: 'Cajas registradas', icon: 'bx-cabinet' },
   { key: 'zonas', label: 'Zonas registradas', icon: 'bx-map' },
-  { key: 'mensualidades', label: 'Mensualidades registradas', icon: 'bx-receipt' },
+  { key: 'cortes', label: 'Cortes registrados', icon: 'bx-receipt' },
 ];
 
 export default function EstadisticasVista({ totales, cargando }: EstadisticasVistaProps) {

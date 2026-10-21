@@ -20,7 +20,7 @@ model Usuario {
   zonas     Zona[]
   planes    Plan[]
   clientes  Cliente[]
-  mensualidades Mensualidad[]
+  cortes    Corte[]
 }
 
 model Zona {
@@ -71,10 +71,9 @@ model Caja {
 
 model Cliente {
   id               Int           @id @default(autoincrement())
-  nombre           String
-  usuarioId        Int
-  usuario          Usuario   @relation(fields: [usuarioId], references: [id])
-  apellido         String
+  usuario          String
+  propietarioId    Int
+  propietario      Usuario   @relation(fields: [propietarioId], references: [id])
   cedula           String?       @unique
   telefono         String?
   direccion        String
@@ -88,12 +87,12 @@ model Cliente {
   estado           String        @default("activo")
   fechaInstalacion DateTime?
   ipAsignada       String?
-  mensualidades    Mensualidad[]
+  cortes           Corte[]
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 }
 
-model Mensualidad {
+model Corte {
   id               Int       @id @default(autoincrement())
   clienteId        Int
   usuarioId        Int
@@ -101,9 +100,11 @@ model Mensualidad {
   cliente          Cliente   @relation(fields: [clienteId], references: [id])
   monto            Float
   periodo          String
-  fechaVencimiento DateTime
+  fechaVencimiento DateTime?
+  fechaCorte       DateTime?
   fechaPago        DateTime?
   estado           String    @default("pendiente")
+  revisado         Boolean   @default(false)
   observacion      String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt

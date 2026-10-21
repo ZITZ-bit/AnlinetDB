@@ -161,9 +161,9 @@ export default function Navbar({ onSelect }: NavbarProps) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleSelect("CrearPlanMensualidad")}
+                    onClick={() => handleSelect("CrearPlanCorte")}
                   >
-                    Planes y Mensualidades
+                    Planes y Cortes
                   </button>
                   <button
                     type="button"

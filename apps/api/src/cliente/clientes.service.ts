@@ -13,10 +13,9 @@ export class ClientesService {
       return await this.prisma.cliente.create({
         data: {
           ...createClienteDto,
-          nombre: createClienteDto.nombre.trim(),
-          apellido: createClienteDto.apellido.trim(),
+          usuario: createClienteDto.usuario.trim(),
           direccion: createClienteDto.direccion.trim(),
-          usuarioId,
+          propietarioId: usuarioId,
         },
       });
     } catch (error) {
@@ -26,7 +25,7 @@ export class ClientesService {
 
   async findAll(usuarioId: number) {
     return this.prisma.cliente.findMany({
-      where: { usuarioId },
+      where: { propietarioId: usuarioId },
       include: {
         zona: true,
         plan: true,
@@ -38,7 +37,7 @@ export class ClientesService {
 
   async findOne(id: number, usuarioId: number) {
     const cliente = await this.prisma.cliente.findFirst({
-      where: { id, usuarioId },
+      where: { id, propietarioId: usuarioId },
       include: {
         zona: true,
         plan: true,

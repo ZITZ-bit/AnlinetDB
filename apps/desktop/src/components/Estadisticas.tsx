@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, type Caja, type Cliente, type Mensualidad, type Zona } from '@/lib/api';
+import { api, type Caja, type Cliente, type Corte, type Zona } from '@/lib/api';
 import EstadisticasVista from '@/features/Estadisticas/EstadisticasVista';
 
 export default function Estadisticas() {
-  const [totales, setTotales] = useState({ clientes: 0, cajas: 0, zonas: 0, mensualidades: 0 });
+  const [totales, setTotales] = useState({ clientes: 0, cajas: 0, zonas: 0, cortes: 0 });
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
@@ -13,17 +13,17 @@ export default function Estadisticas() {
       api.clientes.getAll(),
       api.cajas.getAll(),
       api.zonas.getAll(),
-      api.mensualidades.getAll(),
+      api.cortes.getAll(),
     ])
-      .then(([clientes, cajas, zonas, mensualidades]: [Cliente[], Caja[], Zona[], Mensualidad[]]) => {
+      .then(([clientes, cajas, zonas, cortes]: [Cliente[], Caja[], Zona[], Corte[]]) => {
         setTotales({
           clientes: clientes.length,
           cajas: cajas.length,
           zonas: zonas.length,
-          mensualidades: mensualidades.length,
+          cortes: cortes.length,
         });
       })
-      .catch(() => setTotales({ clientes: 0, cajas: 0, zonas: 0, mensualidades: 0 }))
+      .catch(() => setTotales({ clientes: 0, cajas: 0, zonas: 0, cortes: 0 }))
       .finally(() => setCargando(false));
   }, []);
 

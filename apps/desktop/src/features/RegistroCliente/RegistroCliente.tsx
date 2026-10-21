@@ -3,11 +3,17 @@ import { useState, useEffect, useRef } from 'react';
 import './RegistroCliente.css';
 import { api, getErrorMessage, type Caja, type Plan, type Zona } from '../../lib/api';
 import { useToast } from '../../components/Toast/use-toast';
-import { periodoActual, vencimientoActual } from '../../lib/mensualidad';
+import { periodoActual, vencimientoActual } from '../../lib/corte';
+
+function fechaLocal(date: Date): string {
+  const anio = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, '0');
+  const dia = String(date.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+}
 
 export default function RegistroCliente() {
-  const [nombre, setNombre] = useState('');
-  const [apellido, setApellido] = useState('');
+  const [usuario, setUsuario] = useState('');
   const [cedula, setCedula] = useState('');
   const [telefono, setTelefono] = useState('');
   const [direccion, setDireccion] = useState('');
@@ -17,7 +23,7 @@ export default function RegistroCliente() {
   const [cajas, setCajas] = useState<Caja[]>([]);
   const [planId, setPlanId] = useState('');
   const [planes, setPlanes] = useState<Plan[]>([]);
-  const [mensualidad, setMensualidad] = useState('');
+  const [fechaVencimiento, setFechaVencimiento] = useState(() => fechaLocal(vencimientoActual()));
   const [loading, setLoading] = useState(false);
   const [cargandoCatalogos, setCargandoCatalogos] = useState(true);
   const { showToast } = useToast();
@@ -55,18 +61,18 @@ export default function RegistroCliente() {
       return;
     }
 
-    const monto = mensualidad ? Number(mensualidad) : 0;
-
-    if (Number.isNaN(monto) || monto < 0) {
-      showToast('El monto de la mensualidad no es válido', 'error');
+    if (!fechaVencimiento) {
+      showToast('Selecciona la fecha de vencimiento', 'error');
       return;
     }
+
+    const plan = planes.find((p) => p.id === parseInt(planId));
+    const monto = plan?.precio ?? 0;
 
     setLoading(true);
     try {
       const cliente = await api.clientes.create({
-        nombre: nombre.trim(),
-        apellido: apellido.trim(),
+        usuario: usuario.trim(),
         cedula: cedula.trim() || undefined,
         telefono: telefono.trim() || undefined,
         direccion: direccion.trim(),
@@ -77,28 +83,25 @@ export default function RegistroCliente() {
 
       showToast('Cliente registrado exitosamente');
 
-      if (monto > 0) {
-        try {
-          await api.mensualidades.create({
-            clienteId: cliente.id,
-            monto,
-            periodo: periodoActual(),
-            fechaVencimiento: vencimientoActual().toISOString(),
-          });
-        } catch {
-          showToast('El cliente se registró, pero la mensualidad no', 'error');
-        }
+      try {
+        await api.cortes.create({
+          clienteId: cliente.id,
+          monto,
+          periodo: periodoActual(new Date(`${fechaVencimiento}T12:00:00`)),
+          fechaVencimiento: new Date(`${fechaVencimiento}T12:00:00`).toISOString(),
+        });
+      } catch {
+        showToast('El cliente se registró, pero el corte no', 'error');
       }
 
-      setNombre('');
-      setApellido('');
+      setUsuario('');
       setCedula('');
       setTelefono('');
       setDireccion('');
       setZonaId('');
       setPlanId('');
       setCajaId('');
-      setMensualidad('');
+      setFechaVencimiento(fechaLocal(vencimientoActual()));
     } catch (err) {
       showToast(getErrorMessage(err, 'Error al registrar cliente'), 'error');
     } finally {
@@ -121,36 +124,6 @@ export default function RegistroCliente() {
                 <label>
                   <input
                     type="text"
-                    required
-                    maxLength={100}
-                    placeholder=" "
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                  />
-                  <span>Nombre</span>
-                </label>
-              </div>
-
-              <div className="rc-input-group">
-                <label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={100}
-                    placeholder=" "
-                    value={apellido}
-                    onChange={(e) => setApellido(e.target.value)}
-                  />
-                  <span>Apellido</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="rc-row">
-              <div className="rc-input-group">
-                <label>
-                  <input
-                    type="text"
                     maxLength={20}
                     placeholder=" "
                     value={cedula}
@@ -163,15 +136,29 @@ export default function RegistroCliente() {
               <div className="rc-input-group">
                 <label>
                   <input
-                    type="tel"
-                    maxLength={20}
+                    type="text"
+                    required
+                    maxLength={100}
                     placeholder=" "
-                    value={telefono}
-                    onChange={(e) => setTelefono(e.target.value)}
+                    value={usuario}
+                    onChange={(e) => setUsuario(e.target.value)}
                   />
-                  <span>Teléfono</span>
+                  <span>Usuario</span>
                 </label>
               </div>
+            </div>
+
+            <div className="rc-input-group">
+              <label>
+                <input
+                  type="tel"
+                  maxLength={20}
+                  placeholder=" "
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                />
+                <span>Teléfono</span>
+              </label>
             </div>
 
             <div className="rc-input-group">
@@ -208,9 +195,8 @@ export default function RegistroCliente() {
               </label>
             </div>
 
-            <div className="rc-row">
-              <div className="rc-input-group">
-                <label>
+            <div className="rc-input-group">
+              <label>
                 <select
                   className={cajaId ? 'rc-select-has-value' : ''}
                   value={cajaId}
@@ -224,22 +210,19 @@ export default function RegistroCliente() {
                     ))}
                 </select>
                 <span>Caja</span>
-                </label>
-              </div>
+              </label>
+            </div>
 
-              <div className="rc-input-group">
-                <label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder=" "
-                    value={mensualidad}
-                    onChange={(e) => setMensualidad(e.target.value)}
-                  />
-                  <span>Mensualidad</span>
-                </label>
-              </div>
+            <div className="rc-input-group">
+              <label>
+                <input
+                  type="date"
+                  required
+                  value={fechaVencimiento}
+                  onChange={(e) => setFechaVencimiento(e.target.value)}
+                />
+                <span>Fecha de vencimiento</span>
+              </label>
             </div>
 
             <div className="rc-input-group">

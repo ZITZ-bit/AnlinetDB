@@ -106,6 +106,7 @@
 
 .rc-input-group input:focus + span,
 .rc-input-group input:not(:placeholder-shown) + span,
+.rc-input-group input[type="date"] + span,
 .rc-input-group select:focus + span,
 .rc-input-group select[required]:valid + span,
 .rc-input-group select.rc-select-has-value + span {

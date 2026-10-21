@@ -2,18 +2,13 @@ import {
   IsString,
   IsNumber,
   IsOptional,
-  IsBoolean,
   MaxLength,
 } from 'class-validator';
 
 export class CreateClienteDto {
   @IsString()
   @MaxLength(100)
-  nombre: string;
-
-  @IsString()
-  @MaxLength(100)
-  apellido: string;
+  usuario: string;
 
   @IsOptional()
   @IsString()

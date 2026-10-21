@@ -9,7 +9,7 @@ import Estadisticas from "@/components/Estadisticas";
 
 import RegistroCliente from "@/features/RegistroCliente/RegistroCliente";
 import CrearCajas from "@/features/CrearCajas/CrearCajas";
-import PlanesMensualidades from "@/features/PlanesMensualidades/PlanesMensualidades";
+import PlanesCortes from "@/features/PlanesCortes/PlanesCortes";
 import RegistrarZona from "@/features/RegistrarZona/RegistrarZona";
 
 import "../../../styles/dashboard.css";
@@ -30,7 +30,7 @@ export default function Dashboard() {
         {activeSection === "CrearCajas" && <CrearCajas />}
         {activeSection === "Cajas" && <VerCajas />}
         {activeSection === "Estadisticas" && <Estadisticas />}
-        {activeSection === "CrearPlanMensualidad" && <PlanesMensualidades />}
+        {activeSection === "CrearPlanCorte" && <PlanesCortes />}
         {activeSection === "RegistrarZona" && <RegistrarZona />}
       </main>
 
