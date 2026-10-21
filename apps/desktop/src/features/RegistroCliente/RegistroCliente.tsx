@@ -17,6 +17,9 @@ export default function RegistroCliente() {
   const [cedula, setCedula] = useState('');
   const [telefono, setTelefono] = useState('');
   const [direccion, setDireccion] = useState('');
+  const [referencia, setReferencia] = useState('');
+  const [ipAsignada, setIpAsignada] = useState('');
+  const [estado, setEstado] = useState('activo');
   const [zonaId, setZonaId] = useState('');
   const [zonas, setZonas] = useState<Zona[]>([]);
   const [cajaId, setCajaId] = useState('');
@@ -76,6 +79,9 @@ export default function RegistroCliente() {
         cedula: cedula.trim() || undefined,
         telefono: telefono.trim() || undefined,
         direccion: direccion.trim(),
+        referencia: referencia.trim() || undefined,
+        ipAsignada: ipAsignada.trim() || undefined,
+        estado,
         zonaId: parseInt(zonaId),
         planId: parseInt(planId),
         cajaId: cajaId ? parseInt(cajaId) : undefined,
@@ -98,6 +104,9 @@ export default function RegistroCliente() {
       setCedula('');
       setTelefono('');
       setDireccion('');
+      setReferencia('');
+      setIpAsignada('');
+      setEstado('activo');
       setZonaId('');
       setPlanId('');
       setCajaId('');
@@ -174,6 +183,32 @@ export default function RegistroCliente() {
                 <span>Dirección</span>
               </label>
             </div>
+
+            <div className="rc-input-group">
+              <label>
+                <input
+                  type="text"
+                  maxLength={200}
+                  placeholder=" "
+                  value={referencia}
+                  onChange={(e) => setReferencia(e.target.value)}
+                />
+                <span>Referencia</span>
+              </label>
+            </div>
+
+            <div className="rc-input-group">
+              <label>
+                <input
+                  type="text"
+                  maxLength={50}
+                  placeholder=" "
+                  value={ipAsignada}
+                  onChange={(e) => setIpAsignada(e.target.value)}
+                />
+                <span>IP Asignada</span>
+              </label>
+            </div>
           </div>
 
           <div className="rc-right-column">
@@ -210,6 +245,20 @@ export default function RegistroCliente() {
                     ))}
                 </select>
                 <span>Caja</span>
+              </label>
+            </div>
+
+            <div className="rc-input-group">
+              <label>
+                <select
+                  value={estado}
+                  onChange={(e) => setEstado(e.target.value)}
+                >
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                  <option value="suspendido">Suspendido</option>
+                </select>
+                <span>Estado</span>
               </label>
             </div>
 

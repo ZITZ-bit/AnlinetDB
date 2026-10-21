@@ -162,11 +162,13 @@ export async function apiFetch<T = unknown>(path: string, options?: RequestInit)
 export const api = {
   zonas: {
     getAll: () => apiFetch<Zona[]>('/zonas'),
+    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
     create: (data: { nombre: string; descripcion?: string }) =>
       apiFetch<Zona>('/zonas', { method: 'POST', body: JSON.stringify(data) }),
   },
   planes: {
     getAll: () => apiFetch<Plan[]>('/planes'),
+    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
     create: (data: {
       nombre: string;
       velocidad?: string;
@@ -176,6 +178,7 @@ export const api = {
   },
   cajas: {
     getAll: () => apiFetch<Caja[]>('/cajas'),
+    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
     create: (data: {
       codigoCaja: string;
       direccion?: string;
@@ -189,18 +192,38 @@ export const api = {
   },
   clientes: {
     getAll: () => apiFetch<Cliente[]>('/clientes'),
+    update: (id: number, data: {
+      usuario: string;
+      cedula: string | null;
+      telefono: string | null;
+      direccion: string;
+      referencia: string | null;
+      zonaId: number;
+      cajaId: number | null;
+      planId: number;
+      estado: string;
+      ipAsignada: string | null;
+    }) => apiFetch<Cliente>(`/clientes/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
     create: (data: {
       usuario: string;
       cedula?: string;
       telefono?: string;
       direccion: string;
+      referencia?: string;
       zonaId: number;
       planId: number;
       cajaId?: number;
+      estado?: string;
+      ipAsignada?: string;
     }) => apiFetch<Cliente>('/clientes', { method: 'POST', body: JSON.stringify(data) }),
   },
   cortes: {
     getAll: () => apiFetch<Corte[]>('/cortes'),
+    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
     create: (data: {
       clienteId: number;
       monto: number;

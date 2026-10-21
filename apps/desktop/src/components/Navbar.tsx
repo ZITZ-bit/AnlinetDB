@@ -1,11 +1,115 @@
 "use client";
 import { useState, useRef, useEffect, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 
 import { useRouter } from "next/navigation";
 import { HiMenu } from "react-icons/hi";
+import { HiAdjustmentsHorizontal, HiArrowPath, HiBell, HiCheck, HiXMark } from "react-icons/hi2";
 
 interface NavbarProps {
   onSelect: (section: string) => void;
+}
+
+function SettingsModal({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      className="settings-modal-backdrop"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section className="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <header className="settings-modal-header">
+          <div className="settings-modal-heading-icon"><HiAdjustmentsHorizontal aria-hidden="true" /></div>
+          <div className="settings-modal-heading-copy">
+            <span className="settings-modal-eyebrow">Preferencias</span>
+            <h2 id="settings-modal-title">Ajustes</h2>
+            <p>Personaliza tu espacio de trabajo</p>
+          </div>
+          <button type="button" className="settings-modal-close" onClick={onClose} aria-label="Cerrar ajustes">
+            <HiXMark aria-hidden="true" />
+          </button>
+        </header>
+
+        <div className="settings-modal-content">
+          <section className="settings-group" aria-labelledby="settings-theme-title">
+            <div className="settings-group-heading">
+              <div>
+                <h3 id="settings-theme-title">Apariencia</h3>
+                <p>Elige el aspecto de AnlinetDB</p>
+              </div>
+              <span className="settings-group-tag">INTERFAZ</span>
+            </div>
+            <div className="settings-theme-options">
+              <div className="settings-theme-option is-selected" aria-label="Tema claro seleccionado">
+                <span className="settings-theme-preview settings-theme-light"><i /><i /><i /></span>
+                <span className="settings-theme-label">Claro</span>
+                <HiCheck className="settings-theme-check" aria-hidden="true" />
+              </div>
+              <div className="settings-theme-option" aria-label="Tema oscuro">
+                <span className="settings-theme-preview settings-theme-dark"><i /><i /><i /></span>
+                <span className="settings-theme-label">Oscuro</span>
+              </div>
+              <div className="settings-theme-option" aria-label="Tema del sistema">
+                <span className="settings-theme-preview settings-theme-system"><i /><i /><i /></span>
+                <span className="settings-theme-label">Sistema</span>
+              </div>
+            </div>
+          </section>
+
+          <section className="settings-group" aria-labelledby="settings-workspace-title">
+            <div className="settings-group-heading">
+              <div>
+                <h3 id="settings-workspace-title">Espacio de trabajo</h3>
+                <p>Preferencias de visualización</p>
+              </div>
+            </div>
+            <div className="settings-preference-row">
+              <span className="settings-preference-icon"><HiAdjustmentsHorizontal aria-hidden="true" /></span>
+              <span className="settings-preference-copy"><strong>Vista compacta</strong><small>Más información en pantalla</small></span>
+              <span className="settings-static-switch" aria-label="Desactivado"><i /></span>
+            </div>
+            <div className="settings-preference-row">
+              <span className="settings-preference-icon"><HiBell aria-hidden="true" /></span>
+              <span className="settings-preference-copy"><strong>Notificaciones</strong><small>Avisos dentro de la aplicación</small></span>
+              <span className="settings-static-switch is-on" aria-label="Activado"><i /></span>
+            </div>
+          </section>
+
+          <section className="settings-update-row" aria-label="Actualizaciones">
+            <div className="settings-update-icon"><HiArrowPath aria-hidden="true" /></div>
+            <div className="settings-update-copy">
+              <strong>Actualizaciones</strong>
+              <span>Versión actual · AnlinetDB Desktop</span>
+            </div>
+            <button type="button" className="settings-update-button">
+              <HiArrowPath aria-hidden="true" />
+              Buscar
+            </button>
+          </section>
+        </div>
+
+        <footer className="settings-modal-footer">
+          <span><i /> Tus preferencias son solo visuales</span>
+          <button type="button" onClick={onClose}>Cerrar</button>
+        </footer>
+      </section>
+    </div>,
+    document.body,
+  );
 }
 
 function subscribeToSession(callback: () => void) {
@@ -35,6 +139,7 @@ export default function Navbar({ onSelect }: NavbarProps) {
   const menuAnchorRef = useRef<HTMLDivElement | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const openMenu = () => {
     if (timeoutRef.current) {
@@ -105,6 +210,18 @@ export default function Navbar({ onSelect }: NavbarProps) {
           {userMenuOpen && (
             <div className="dashboard-dropdown dashboard-user-dropdown">
               <button
+                type="button"
+                className="dashboard-settings-button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  setSettingsOpen(true);
+                }}
+              >
+                <HiAdjustmentsHorizontal aria-hidden="true" />
+                Ajustes
+              </button>
+              <button
+                type="button"
                 onClick={() => {
                   localStorage.removeItem("anlinet:session");
                   localStorage.removeItem("token");
@@ -177,6 +294,7 @@ export default function Navbar({ onSelect }: NavbarProps) {
           </div>
         </section>
       </div>
+      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
     </nav>
   );
 }
