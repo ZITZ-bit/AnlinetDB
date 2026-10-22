@@ -1,0 +1,59 @@
+/* Badge de estado compartido por la tabla del dashboard y la vista de cajas */
+
+.estado-badge {
+    flex: 0 0 auto;
+    padding: 0.25rem 0.45rem;
+    border: 1px solid #cce3d8;
+    border-radius: 2px;
+    background: #edf7f1;
+    color: #216c4c;
+    font-size: 0.68rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.estado-badge[data-state="mantenimiento"],
+.estado-badge[data-state="pendiente"],
+.estado-badge[data-state="pendiente_manual"] {
+    border-color: #eadcae;
+    background: #fbf6e6;
+    color: #84691d;
+}
+
+.estado-badge[data-state="inactivo"],
+.estado-badge[data-state="averiada"] {
+    border-color: #e8c8c5;
+    background: #fbefee;
+    color: #994740;
+}
+
+.estado-badge[data-state="transferencia"] {
+    border-color: #b9d8f2;
+    background: #eaf4fd;
+    color: #205c91;
+}
+
+.estado-badge[data-state="divisa"] {
+    border-color: #a9ddce;
+    background: #e6f7f0;
+    color: #176b51;
+}
+
+.estado-badge[data-state="no_pago"] {
+    border-color: #efb9bb;
+    background: #fff0f0;
+    color: #a52f38;
+}
+
+.estado-badge[data-state="nuevo_ingreso"] {
+    border-color: #d2c4f2;
+    background: #f3efff;
+    color: #6343a5;
+}
+
+.estado-badge[data-state="dsn"] {
+    border-color: #f1b27c;
+    background: #fff0e3;
+    color: #a64d0a;
+}

@@ -1,0 +1,273 @@
+.estadisticas-view {
+  width: 100%;
+  max-width: 1480px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  background-color: #f3f7f5;
+  background-image: linear-gradient(#e5eeea 1px, transparent 1px), linear-gradient(90deg, #e5eeea 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.estadisticas-kicker {
+  color: #657570;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.estadisticas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  max-width: 1100px;
+}
+
+.estadisticas-metric {
+  min-width: 0;
+  min-height: 7.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #d7e2de;
+  border-radius: 4px;
+  background: #fff;
+  animation: estadisticas-enter 320ms ease-out both;
+}
+
+.estadisticas-metric-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #657570;
+  font-size: 0.72rem;
+}
+
+.estadisticas-metric-topline i {
+  color: #03896b;
+  font-size: 1.2rem;
+}
+
+.estadisticas-metric strong {
+  display: block;
+  margin-top: 0.7rem;
+  color: #025f51;
+  font-size: 1.65rem;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.estadisticas-metric p {
+  margin: 0.55rem 0 0;
+  color: #657570;
+  font-size: 0.82rem;
+}
+
+.estadisticas-analisis {
+  max-width: 1100px;
+  margin-top: 2rem;
+  padding: clamp(1rem, 2.5vw, 1.6rem);
+  border: 1px solid #d7e2de;
+  background: #fff;
+  animation: estadisticas-enter 380ms ease-out both;
+}
+
+.estadisticas-analisis-header,
+.estadisticas-analisis-controles,
+.estadisticas-resumen-periodo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.estadisticas-analisis-header h2 {
+  margin: 0.4rem 0 0;
+  color: #18342f;
+  font-size: 1.2rem;
+  font-weight: 650;
+}
+
+.estadisticas-periodos,
+.estadisticas-tabs,
+.estadisticas-tipos-grafica {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  background: #f0f5f2;
+}
+
+.estadisticas-periodos button,
+.estadisticas-tabs button,
+.estadisticas-tipos-grafica button {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: #657570;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.estadisticas-periodos button:hover,
+.estadisticas-tabs button:hover,
+.estadisticas-tipos-grafica button:hover {
+  color: #025f51;
+}
+
+.estadisticas-periodos button.activo,
+.estadisticas-tabs button.activo,
+.estadisticas-tipos-grafica button.activo {
+  background: #fff;
+  color: #025f51;
+  box-shadow: 0 1px 3px #18342f1c;
+}
+
+.estadisticas-analisis-controles {
+  margin-top: 1.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5eeea;
+}
+
+.estadisticas-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #657570;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.estadisticas-selector input,
+.estadisticas-selector select {
+  width: auto;
+  min-height: 2.35rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid #d7e2de;
+  border-radius: 3px;
+  background: #fff;
+  color: #18342f;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.estadisticas-selector input:focus,
+.estadisticas-selector select:focus,
+.estadisticas-periodos button:focus-visible,
+.estadisticas-tabs button:focus-visible,
+.estadisticas-tipos-grafica button:focus-visible {
+  outline: 2px solid #03896b;
+  outline-offset: 2px;
+}
+
+.estadisticas-resumen-periodo {
+  align-items: end;
+  margin: 1.2rem 0 0.4rem;
+}
+
+.estadisticas-resumen-periodo div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+
+.estadisticas-resumen-periodo strong {
+  color: #025f51;
+  font-size: 1.7rem;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.estadisticas-resumen-periodo span {
+  color: #657570;
+  font-size: 0.8rem;
+}
+
+.estadisticas-resumen-periodo .estadisticas-rango {
+  text-transform: capitalize;
+}
+
+.estadisticas-grafica {
+  position: relative;
+  min-height: 220px;
+  margin-top: 0.4rem;
+}
+
+.estadisticas-grafica svg {
+  display: block;
+  width: 100%;
+  height: 220px;
+  overflow: visible;
+}
+
+.estadisticas-linea-guia {
+  stroke: #e5eeea;
+  stroke-dasharray: 3 5;
+  stroke-width: 1;
+}
+
+.estadisticas-barra {
+  fill: #07876c;
+  transition: fill 150ms ease;
+}
+
+.estadisticas-barra:hover {
+  fill: #e27842;
+}
+
+.estadisticas-trazo {
+  fill: none;
+  stroke: #07876c;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.estadisticas-punto-linea {
+  fill: #fff;
+  stroke: #07876c;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.estadisticas-etiqueta-eje {
+  fill: #75847f;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.estadisticas-vacio {
+  position: absolute;
+  z-index: 1;
+  top: 42%;
+  left: 50%;
+  margin: 0;
+  color: #75847f;
+  font-size: 0.84rem;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes estadisticas-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .estadisticas-view { padding: 1.1rem; }
+  .estadisticas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+  .estadisticas-metric { min-height: 6.75rem; padding: 0.75rem; }
+  .estadisticas-metric strong { font-size: 1.5rem; }
+  .estadisticas-analisis-header,
+  .estadisticas-analisis-controles { align-items: stretch; flex-direction: column; }
+  .estadisticas-analisis-header { gap: 0.85rem; }
+  .estadisticas-periodos { align-self: flex-start; }
+  .estadisticas-tipos-grafica { align-self: flex-start; }
+  .estadisticas-analisis-controles { gap: 0.8rem; }
+  .estadisticas-tabs { align-self: flex-start; }
+  .estadisticas-resumen-periodo div { align-items: flex-start; flex-direction: column; gap: 0.3rem; }
+  .estadisticas-grafica,
+  .estadisticas-grafica svg { min-height: 190px; height: 190px; }
+}

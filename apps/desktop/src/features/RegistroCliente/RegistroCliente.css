@@ -1,0 +1,9 @@
+/* Estilos propios de RegistroCliente. El resto del formulario usa styles/form-kit.css */
+
+/* El select de caja no es required: se marca con esta clase para flotar su etiqueta */
+.form-select-has-value + span {
+  top: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #025F51;
+}

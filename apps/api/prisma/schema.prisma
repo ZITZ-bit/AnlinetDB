@@ -1,0 +1,111 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  apellido  String
+  usuario   String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cajas     Caja[]
+  zonas     Zona[]
+  planes    Plan[]
+  clientes  Cliente[]
+  cortes    Corte[]
+}
+
+model Zona {
+  id          Int       @id @default(autoincrement())
+  nombre      String
+  usuarioId   Int
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  descripcion String?
+  clientes    Cliente[]
+  cajas       Caja[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@unique([nombre, usuarioId])
+}
+
+model Plan {
+  id          Int       @id @default(autoincrement())
+  nombre      String
+  usuarioId   Int
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  velocidad   String?
+  precio      Float
+  descripcion String?
+  activo      Boolean   @default(true)
+  clientes    Cliente[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@unique([nombre, usuarioId])
+}
+
+model Caja {
+  id            Int       @id @default(autoincrement())
+  codigoCaja    String    @unique
+  direccion     String?
+  zonaId        Int?
+  zona          Zona?     @relation(fields: [zonaId], references: [id])
+  usuarioId     Int
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id])
+  tipo          String    @default("principal")
+  capacidad     Int       @default(0)
+  puertosLibres Int       @default(0)
+  estado        String    @default("disponible")
+  observaciones String?
+  clientes      Cliente[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Cliente {
+  id               Int           @id @default(autoincrement())
+  usuario          String
+  propietarioId    Int
+  propietario      Usuario   @relation(fields: [propietarioId], references: [id])
+  cedula           String?       @unique
+  telefono         String?
+  direccion        String
+  referencia       String?
+  zonaId           Int
+  zona             Zona          @relation(fields: [zonaId], references: [id])
+  cajaId           Int?
+  caja             Caja?         @relation(fields: [cajaId], references: [id])
+  planId           Int
+  plan             Plan          @relation(fields: [planId], references: [id])
+  estado           String        @default("activo")
+  fechaInstalacion DateTime?
+  ipAsignada       String?
+  cortes           Corte[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Corte {
+  id               Int       @id @default(autoincrement())
+  clienteId        Int
+  usuarioId        Int
+  usuario          Usuario   @relation(fields: [usuarioId], references: [id])
+  cliente          Cliente   @relation(fields: [clienteId], references: [id])
+  monto            Float
+  periodo          String
+  fechaVencimiento DateTime?
+  fechaCorte       DateTime?
+  fechaPago        DateTime?
+  estado           String    @default("pendiente")
+  revisado         Boolean   @default(false)
+  observacion      String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}

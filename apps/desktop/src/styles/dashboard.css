@@ -1,0 +1,40 @@
+/* Shell del dashboard: contenedor, header y area de contenido.
+   Los estilos de cada vista viven en su propia carpeta (components/tabla, features/*). */
+
+.dashboard {
+  --dashboard-green: #025f51;
+  --dashboard-green-dark: #01483e;
+  --dashboard-green-light: #04a777;
+  --dashboard-mint: #e8f4f0;
+  --dashboard-ink: #18342f;
+  --dashboard-muted: #657570;
+  --dashboard-line: #d7e2de;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 2.25rem);
+  background: #f3f7f5;
+  color: var(--dashboard-ink);
+  font-family: "Aptos", "Segoe UI Variable", "Segoe UI", sans-serif;
+}
+.dashboard-header {
+  z-index: 10;
+  width: 100%;
+  flex-shrink: 0;
+  background: var(--dashboard-green);
+}
+.dashboard-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: #f3f7f5;
+}
+.dashboard-main::-webkit-scrollbar {
+  width: 9px;
+}
+.dashboard-main::-webkit-scrollbar-track {
+  background: #e8efec;
+}
+.dashboard-main::-webkit-scrollbar-thumb {
+  border: 2px solid #e8efec;
+  background: #7b9e93;
+}

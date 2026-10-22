@@ -13,6 +13,24 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Electron main process is CommonJS and legitimately uses require().
+  {
+    files: ["electron/**/*.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      ecmaVersion: 2022,
+      globals: {
+        __dirname: "readonly",
+        require: "readonly",
+        module: "readonly",
+        process: "readonly",
+        console: "readonly",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

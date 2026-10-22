@@ -1,0 +1,235 @@
+.vc-view {
+  --vc-green: #025f51;
+  --vc-green-dark: #01483e;
+  --vc-green-light: #04a777;
+  --vc-mint: #e8f4f0;
+  --vc-ink: #18342f;
+  --vc-muted: #657570;
+  --vc-line: #d7e2de;
+  width: 100%;
+  min-height: 100%;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  background-color: #f3f7f5;
+  color: var(--vc-ink);
+  font-family: "Aptos", "Segoe UI Variable", "Segoe UI", sans-serif;
+}
+
+.vc-inner {
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+}
+
+.vc-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--vc-line);
+}
+
+.vc-kicker {
+  display: block;
+  color: var(--vc-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.vc-heading h1 {
+  margin: 0.45rem 0 0;
+  color: var(--vc-ink);
+  font-size: 1.45rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.vc-heading p {
+  margin: 0.35rem 0 0;
+  color: var(--vc-muted);
+  font-size: 0.84rem;
+}
+
+.vc-total {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--vc-line);
+  border-radius: 2px;
+  background: #fff;
+  color: var(--vc-green);
+  font-size: 0.72rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.vc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1rem;
+}
+
+.vc-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--vc-line);
+  border-top: 2px solid var(--vc-green-light);
+  background: #fff;
+  box-shadow: 0 3px 12px rgb(25 57 48 / 5%);
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+  animation: view-enter 360ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.vc-card:hover {
+  border-color: #9bb9ae;
+  box-shadow: 0 8px 20px rgb(25 57 48 / 9%);
+  transform: translateY(-2px);
+}
+
+.vc-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.vc-card-title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--vc-green);
+  font-size: 1rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.vc-capacity {
+  margin-bottom: 1rem;
+}
+
+.vc-capacity-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  color: var(--vc-muted);
+  font-size: 0.72rem;
+}
+
+.vc-capacity-head strong {
+  color: var(--vc-ink);
+  font-size: 0.78rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.vc-capacity-track {
+  width: 100%;
+  height: 0.4rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e4ece8;
+}
+
+.vc-capacity-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--vc-green), var(--vc-green-light));
+  transition: width 400ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.vc-details {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid #eef3f0;
+}
+
+.vc-detail {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.3rem 0;
+  font-size: 0.79rem;
+}
+
+.vc-detail dt {
+  flex: 0 0 auto;
+  color: var(--vc-muted);
+}
+
+.vc-detail dd {
+  margin: 0;
+  color: var(--vc-ink);
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.vc-detail--stack {
+  display: block;
+}
+
+.vc-detail--stack dd {
+  margin-top: 0.2rem;
+  font-weight: 500;
+  text-align: left;
+}
+
+.vc-state {
+  display: grid;
+  place-items: center;
+  gap: 0.7rem;
+  padding: 3.5rem 1.5rem;
+  border: 1px solid var(--vc-line);
+  background: #fff;
+  color: var(--vc-muted);
+  text-align: center;
+}
+
+.vc-state i {
+  color: var(--vc-green-light);
+  font-size: 2rem;
+}
+
+.vc-state p {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.vc-spinner {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 2px solid #d7e2de;
+  border-top-color: var(--vc-green);
+  border-radius: 50%;
+  animation: vc-spin 800ms linear infinite;
+}
+
+@keyframes vc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .vc-view {
+    padding: 1.1rem;
+  }
+
+  .vc-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

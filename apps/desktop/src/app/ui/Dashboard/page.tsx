@@ -1,0 +1,39 @@
+'use client';
+
+import { useState } from "react";
+
+import Navbar from "@/components/Navbar";
+import Tabla from "@/components/Tabla";
+import VerCajas from "@/features/VerCajas/VerCajas";
+import Estadisticas from "@/components/Estadisticas";
+
+import RegistroCliente from "@/features/RegistroCliente/RegistroCliente";
+import CrearCajas from "@/features/CrearCajas/CrearCajas";
+import PlanesCortes from "@/features/PlanesCortes/PlanesCortes";
+import RegistrarZona from "@/features/RegistrarZona/RegistrarZona";
+
+import "../../../styles/dashboard.css";
+
+export default function Dashboard() {
+  const[activeSection, setActiveSection] = useState("Inicio");
+
+  return (
+    <div className="dashboard">
+
+      <header className="dashboard-header">
+        <Navbar onSelect={setActiveSection} />
+      </header>
+
+      <main className="dashboard-main">
+        {activeSection === "Inicio" && <Tabla />}
+        {activeSection === "RegistroCliente" && <RegistroCliente />}
+        {activeSection === "CrearCajas" && <CrearCajas />}
+        {activeSection === "Cajas" && <VerCajas />}
+        {activeSection === "Estadisticas" && <Estadisticas />}
+        {activeSection === "CrearPlanCorte" && <PlanesCortes />}
+        {activeSection === "RegistrarZona" && <RegistrarZona />}
+      </main>
+
+    </div>
+  );
+}
