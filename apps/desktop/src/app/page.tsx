@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/ts/use-auth';
-import { addToast } from '@/components/Toast/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { addToast } from '@/components/toast/use-toast';
 import "../styles/login.css";
+import "../styles/auth.css";
 
 export default function Login() {
   const router = useRouter();
@@ -42,17 +43,17 @@ export default function Login() {
   };
 
   return (
-    <main className="login-container">
-      <form className="login-card" onSubmit={handleSubmit}>
+    <main className="auth-container">
+      <form className="auth-card auth-card--narrow" onSubmit={handleSubmit}>
         <h1>Iniciar sesión</h1>
-        <p className="subtitle">Accede a tu cuenta</p>
+        <p className="auth-subtitle">Accede a tu cuenta</p>
 
         {registrationSuccess && (
-          <p className="success-msg" role="status">
+          <p className="auth-notice auth-notice--success" role="status">
             Cuenta creada correctamente. Inicia sesión para continuar.
           </p>
         )}
-        {error && <p className="error-msg">{error}</p>}
+        {error && <p className="auth-notice auth-notice--error">{error}</p>}
 
         <div className="input-group">
           <label htmlFor="usuario">
@@ -84,17 +85,17 @@ export default function Login() {
 
         <button
           type="submit"
-          className="btn-primary"
+          className="auth-button"
           disabled={loading}
         >
           {loading ? 'Ingresando...' : 'Iniciar sesión'}
         </button>
 
-        <p className="redirect">
+        <p className="auth-redirect">
           ¿No tienes cuenta? <a href="/ui/Registro">Crear cuenta</a>
         </p>
 
-        <span className="footer">© 2026 Anlinet</span>
+        <span className="auth-footer">© 2026 Anlinet</span>
       </form>
     </main>
   );

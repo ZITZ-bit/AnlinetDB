@@ -52,22 +52,43 @@ export function useToast() {
   return { showToast, ToastComponent };
 }
 
+const estilosPorTipo = {
+  success: {
+    borde: 'border-l-[#31846c]',
+    icono: 'text-[#31846c]',
+  },
+  error: {
+    borde: 'border-l-[#bd554b]',
+    icono: 'text-[#bd554b]',
+  },
+  info: {
+    borde: 'border-l-[#4d7891]',
+    icono: 'text-[#4d7891]',
+  },
+} as const;
+
+const iconosPorTipo = {
+  success: '✓',
+  error: '✕',
+  info: 'ℹ',
+} as const;
+
 export function ToastContainer({ current }: { current: Toast[] }) {
   return (
-    <div className="anlinet-toast-container">
+    <div className="pointer-events-none fixed right-4 top-4 z-[9999] flex w-[min(360px,calc(100vw_-_2rem))] flex-col gap-2">
       {current.map((toast) => (
         <div
           key={toast.id}
-          className={`anlinet-toast anlinet-toast--${toast.type}`}
           role={toast.type === 'error' ? 'alert' : 'status'}
           aria-live="polite"
+          className={`pointer-events-auto flex animate-toast-in items-center gap-3 rounded-[5px] border border-black/[0.08] border-l-[3px] bg-white px-3.5 py-3 text-sm font-medium leading-[1.45] text-[#243430] shadow-[0_8px_24px_rgba(23,42,38,0.12)] ${estilosPorTipo[toast.type].borde}`}
         >
-          <span className="anlinet-toast__icon">
-            {toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : 'ℹ'}
+          <span className={`shrink-0 text-base ${estilosPorTipo[toast.type].icono}`}>
+            {iconosPorTipo[toast.type]}
           </span>
-          <span className="anlinet-toast__message">{toast.message}</span>
+          <span className="min-w-0 flex-1">{toast.message}</span>
           <button
-            className="anlinet-toast__close"
+            className="shrink-0 cursor-pointer border-0 bg-transparent p-1 text-base leading-none text-[#71817c] transition-colors hover:text-[#243430]"
             aria-label="Cerrar aviso"
             onClick={() => removeToast(toast.id)}
           >

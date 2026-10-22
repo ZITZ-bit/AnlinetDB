@@ -1,7 +1,6 @@
 import "./globals.css";
 import TitleBar from "@/components/TitleBar";
-import SessionExpiredHandler from "@/components/SessionExpiredHandler";
-import { ToastProvider } from "@/components/Toast/ToastProvider";
+import { AppProviders } from "./providers";
 
 export const metadata = {
   title: "Anlinet",
@@ -12,12 +11,14 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
   return (
     <html lang="en">
       <body>
-        <SessionExpiredHandler />
         <TitleBar />
-        <main className="flex-1 overflow-auto">
-          {children}
-          <ToastProvider />
-        </main>
+
+        <AppProviders>
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
+        </AppProviders>
+        
       </body>
     </html>
   );

@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import './RegistroCliente.css';
+import '../../styles/form-kit.css';
 import { api, getErrorMessage, type Caja, type Plan, type Zona } from '../../lib/api';
-import { useToast } from '../../components/Toast/use-toast';
+import { useToast } from '../../components/toast/use-toast';
 import { periodoActual, vencimientoActual } from '../../lib/corte';
 
 function fechaLocal(date: Date): string {
@@ -119,17 +119,17 @@ export default function RegistroCliente() {
   };
 
   return (
-    <div className="rc-container">
-      <div className="rc-card">
+    <div className="form-kit">
+      <div className="form-kit__card form-kit__card--wide">
         <h1>Registro de Cliente</h1>
-        <p className="rc-subtitle">
+        <p className="form-kit__subtitle">
           Registro de cliente para servicio de fibra óptica
         </p>
 
-        <form className="rc-form-grid" onSubmit={handleSubmit}>
-          <div className="rc-left-column">
-            <div className="rc-row">
-              <div className="rc-input-group">
+        <form className="form-kit__grid" onSubmit={handleSubmit}>
+          <div className="form-kit__column">
+            <div className="form-kit__row">
+              <div className="form-kit__field">
                 <label>
                   <input
                     type="text"
@@ -142,7 +142,7 @@ export default function RegistroCliente() {
                 </label>
               </div>
 
-              <div className="rc-input-group">
+              <div className="form-kit__field">
                 <label>
                   <input
                     type="text"
@@ -157,7 +157,7 @@ export default function RegistroCliente() {
               </div>
             </div>
 
-            <div className="rc-input-group">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="tel"
@@ -170,7 +170,7 @@ export default function RegistroCliente() {
               </label>
             </div>
 
-            <div className="rc-input-group">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -184,7 +184,7 @@ export default function RegistroCliente() {
               </label>
             </div>
 
-            <div className="rc-input-group">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -197,7 +197,7 @@ export default function RegistroCliente() {
               </label>
             </div>
 
-            <div className="rc-input-group">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -211,8 +211,8 @@ export default function RegistroCliente() {
             </div>
           </div>
 
-          <div className="rc-right-column">
-            <div className="rc-input-group">
+          <div className="form-kit__column">
+            <div className="form-kit__field">
               <label>
                 <select
                   required
@@ -230,10 +230,10 @@ export default function RegistroCliente() {
               </label>
             </div>
 
-            <div className="rc-input-group">
+            <div className="form-kit__field">
               <label>
                 <select
-                  className={cajaId ? 'rc-select-has-value' : ''}
+                  className={cajaId ? 'form-select-has-value' : ''}
                   value={cajaId}
                   onChange={(e) => setCajaId(e.target.value)}
                 >
@@ -248,7 +248,7 @@ export default function RegistroCliente() {
               </label>
             </div>
 
-            <div className="rc-input-group">
+            <div className="form-kit__field">
               <label>
                 <select
                   value={estado}
@@ -262,7 +262,7 @@ export default function RegistroCliente() {
               </label>
             </div>
 
-            <div className="rc-input-group">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="date"
@@ -274,7 +274,7 @@ export default function RegistroCliente() {
               </label>
             </div>
 
-            <div className="rc-input-group">
+            <div className="form-kit__field">
               <label>
                 <select
                   required
@@ -293,10 +293,10 @@ export default function RegistroCliente() {
             </div>
           </div>
 
-          <div className="rc-full-width">
+          <div className="form-kit__actions">
             <button
               type="submit"
-              className="rc-btn-primary"
+              className="form-kit__button"
               disabled={loading || cargandoCatalogos}
             >
               {loading ? 'Guardando...' : 'Guardar Cliente'}

@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
-import './PlanesCortes.css';
+import '../../styles/form-kit.css';
 import { api, getErrorMessage } from '../../lib/api';
-import { useToast } from '../../components/Toast/use-toast';
+import { useToast } from '../../components/toast/use-toast';
 
 export default function PlanesCortes() {
   const [nombre, setNombre] = useState('');
@@ -43,16 +43,16 @@ export default function PlanesCortes() {
   };
 
   return (
-    <div className="pm-container">
-      <div className="pm-card">
+    <div className="form-kit">
+      <div className="form-kit__card">
         <h1>Planes y Cortes</h1>
-        <p className="pm-subtitle">
+        <p className="form-kit__subtitle">
           Configuración de planes de fibra óptica y valores de corte
         </p>
 
-        <form className="pm-form-grid" onSubmit={handleSubmit}>
-          <div className="pm-left-column">
-            <div className="pm-input-group">
+        <form className="form-kit__grid form-kit__grid--single" onSubmit={handleSubmit}>
+          <div className="form-kit__column form-kit__column--narrow">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -66,8 +66,8 @@ export default function PlanesCortes() {
               </label>
             </div>
 
-            <div className="pm-row">
-              <div className="pm-input-group">
+            <div className="form-kit__row form-kit__row--tight form-kit__row--stack">
+              <div className="form-kit__field">
                 <label>
                   <input
                     type="text"
@@ -79,7 +79,7 @@ export default function PlanesCortes() {
                 </label>
               </div>
 
-              <div className="pm-input-group">
+              <div className="form-kit__field">
                 <label>
                 <input
                   type="number"
@@ -94,7 +94,7 @@ export default function PlanesCortes() {
               </div>
             </div>
 
-            <div className="pm-input-group">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -107,8 +107,8 @@ export default function PlanesCortes() {
             </div>
           </div>
 
-          <div className="pm-full-width">
-            <button type="submit" className="pm-btn-primary" disabled={loading}>
+          <div className="form-kit__actions">
+            <button type="submit" className="form-kit__button" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar'}
             </button>
           </div>

@@ -1,4 +1,4 @@
-import type { Cliente } from './api';
+import type { Cliente } from '../api';
 
 export function normalizar(valor: string): string {
   return valor

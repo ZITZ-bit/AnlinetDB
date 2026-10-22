@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import './CrearCajas.css';
+import '../../styles/form-kit.css';
 import { api, getErrorMessage, type Zona } from '../../lib/api';
-import { useToast } from '../../components/Toast/use-toast';
+import { useToast } from '../../components/toast/use-toast';
 
 export default function CrearCajas() {
   const [codigoCaja, setCodigoCaja] = useState('');
@@ -58,16 +58,16 @@ export default function CrearCajas() {
   };
 
   return (
-    <div className="cx-wrapper">
-      <div className="cx-panel">
+    <div className="form-kit">
+      <div className="form-kit__card form-kit__card--wide">
         <h1>Registrar Caja</h1>
-        <p className="cx-description">
+        <p className="form-kit__subtitle">
           Ingresa los datos de la caja de distribución
         </p>
 
-        <form className="cx-grid" onSubmit={handleSubmit}>
-          <div className="cx-side-left">
-            <div className="cx-field">
+        <form className="form-kit__grid" onSubmit={handleSubmit}>
+          <div className="form-kit__column">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -80,7 +80,7 @@ export default function CrearCajas() {
               </label>
             </div>
 
-            <div className="cx-field">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -92,8 +92,8 @@ export default function CrearCajas() {
               </label>
             </div>
 
-            <div className="cx-inline">
-              <div className="cx-field">
+            <div className="form-kit__row">
+              <div className="form-kit__field">
                 <label>
                   <select required value={zonaId} onChange={(e) => setZonaId(e.target.value)}>
                     <option value="" disabled hidden></option>
@@ -107,7 +107,7 @@ export default function CrearCajas() {
                 </label>
               </div>
 
-              <div className="cx-field">
+              <div className="form-kit__field">
                 <label>
                   <select required value={tipo} onChange={(e) => setTipo(e.target.value)}>
                     <option value="" disabled hidden></option>
@@ -122,9 +122,9 @@ export default function CrearCajas() {
             </div>
           </div>
 
-          <div className="cx-side-right">
-            <div className="cx-inline">
-              <div className="cx-field">
+          <div className="form-kit__column">
+            <div className="form-kit__row">
+              <div className="form-kit__field">
                 <label>
                   <select required value={capacidad} onChange={(e) => setCapacidad(e.target.value)}>
                     <option value="" disabled hidden></option>
@@ -140,7 +140,7 @@ export default function CrearCajas() {
                 </label>
               </div>
 
-              <div className="cx-field">
+              <div className="form-kit__field">
                 <label>
                   <input
                     type="number"
@@ -155,7 +155,7 @@ export default function CrearCajas() {
               </div>
             </div>
 
-            <div className="cx-field">
+            <div className="form-kit__field">
               <label>
                 <select required value={estado} onChange={(e) => setEstado(e.target.value)}>
                   <option value="" disabled hidden></option>
@@ -168,7 +168,7 @@ export default function CrearCajas() {
               </label>
             </div>
 
-            <div className="cx-field">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -181,8 +181,8 @@ export default function CrearCajas() {
             </div>
           </div>
 
-          <div className="cx-full">
-            <button type="submit" className="cx-button" disabled={loading}>
+          <div className="form-kit__actions">
+            <button type="submit" className="form-kit__button" disabled={loading}>
               {loading ? 'Guardando...' : 'Registrar Caja'}
             </button>
           </div>

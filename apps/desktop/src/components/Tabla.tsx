@@ -1,545 +1,65 @@
-'use client'
+"use client";
 
-import "boxicons/css/boxicons.min.css"
-import "@/app/globals.css"
+import "boxicons/css/boxicons.min.css";
+import "@/app/globals.css";
 
-import { TablaMeses, useMesesTabla } from "../hooks/js/tabla"
-import { useEffect, useMemo, useRef, useState, ReactNode, RefObject } from "react"
-import { createPortal } from "react-dom"
-import { mesDePeriodo } from "../lib/corte"
-import { api, getErrorMessage, type Caja, type Cliente, type Corte, type Plan, type Zona } from '../lib/api'
-import { coincideUsuarioOCedula, coincideZonaOCaja, normalizar } from '../lib/busqueda'
-import { addToast } from "./Toast/use-toast"
+import { useState } from "react";
 
-const etiquetasEstado = [
-  { value: "pendiente_manual", label: "Pendiente" },
-  { value: "transferencia", label: "Transferencia" },
-  { value: "divisa", label: "Divisa" },
-  { value: "no_pago", label: "No pago" },
-  { value: "nuevo_ingreso", label: "Nuevo ingreso" },
-  { value: "dsn", label: "DSN" },
-]
+import { TablaMeses, useMesesTabla } from "../lib/tabla/meses";
+import { todosLosValores } from "../lib/tabla/etiquetas";
+import { useTablaDatos } from "../lib/tabla/useTablaDatos";
 
-interface DropdownMenuProps {
-  children: ReactNode
-  buttonRef: RefObject<HTMLButtonElement | null>
-  onClose: () => void
-}
+import type { Cliente } from "../lib/api";
 
-function DropdownMenu({ children, buttonRef, onClose }: DropdownMenuProps) {
+import { ClienteModal } from "./tabla/ClienteModal";
+import { EstadoCorteCell } from "./tabla/EstadoCorteCell";
+import { FiltroEtiquetas } from "./tabla/FiltroEtiquetas";
+import { FiltroMeses } from "./tabla/FiltroMeses";
+import { ResumenEtiquetas } from "./tabla/ResumenEtiquetas";
+import "./tabla/tabla.css";
 
-  const [position, setPosition] = useState({ top: 0, left: 0 })
-  const menuRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const updatePosition = () => {
-      if (!buttonRef.current) return
-      const rect = buttonRef.current.getBoundingClientRect()
-      const menuWidth = menuRef.current?.offsetWidth || 272
-      const left = Math.max(12, Math.min(rect.left, window.innerWidth - menuWidth - 12))
-      setPosition({ top: rect.bottom + 6, left })
-    }
-
-    updatePosition()
-    window.addEventListener('resize', updatePosition)
-    const closeOnOutsideClick = (event: MouseEvent) => {
-      const target = event.target as Node
-      if (!buttonRef.current?.contains(target) && !menuRef.current?.contains(target)) onClose()
-    }
-    document.addEventListener('click', closeOnOutsideClick)
-    return () => {
-      window.removeEventListener('resize', updatePosition)
-      document.removeEventListener('click', closeOnOutsideClick)
-    }
-  }, [buttonRef, onClose])
-
-  return createPortal(
-    <div ref={menuRef} className="dashboard-month-menu fixed z-50" style={{ top: position.top, left: position.left }}>
-      {children}
-    </div>,
-    document.body
-  )
-}
-
-interface EstadoCorteCellProps {
-  cliente: Cliente
-  mes: number
-  corte?: Corte
-  onSave: (corte: Corte) => void
-}
-
-function EstadoCorteCell({ cliente, mes, corte, onSave }: EstadoCorteCellProps) {
-  const [menuAbierto, setMenuAbierto] = useState(false)
-  const [guardando, setGuardando] = useState(false)
-  const [editando, setEditando] = useState(false)
-  const [eliminando, setEliminando] = useState(false)
-  const buttonRef = useRef<HTMLButtonElement | null>(null)
-  const estado = corte?.estado || "pendiente"
-  const etiqueta = etiquetasEstado.find((item) => item.value === estado)
-  const fechaVencimiento = corte?.fechaVencimiento
-    ? new Date(`${corte.fechaVencimiento.slice(0, 10)}T00:00:00`).toLocaleDateString("es-ES")
-    : null
-
-  const guardarEstado = async (estadoSeleccionado: string) => {
-    if (guardando) return
-    setGuardando(true)
-
-    try {
-      const fecha = new Date()
-      const anio = fecha.getFullYear()
-      const periodo = `${anio}-${String(mes).padStart(2, "0")}`
-      const corteGuardado = corte
-        ? await api.cortes.update(corte.id, { estado: estadoSeleccionado })
-        : await api.cortes.create({
-            clienteId: cliente.id,
-            monto: cliente.plan?.precio ?? 0,
-            periodo,
-            fechaVencimiento: null,
-            estado: estadoSeleccionado,
-          })
-
-      onSave(corteGuardado)
-      setMenuAbierto(false)
-    } catch (error) {
-      addToast(getErrorMessage(error, "No se pudo actualizar la etiqueta"), "error")
-    } finally {
-      setGuardando(false)
-    }
-  }
-
-  const quitarEtiqueta = async () => {
-    if (!corte) {
-      setMenuAbierto(false)
-      return
-    }
-
-    if (guardando) return
-    setGuardando(true)
-
-    try {
-      const corteActualizado = await api.cortes.update(corte.id, { estado: "pendiente" })
-      onSave(corteActualizado)
-      setMenuAbierto(false)
-    } catch (error) {
-      addToast(getErrorMessage(error, "No se pudo quitar la etiqueta"), "error")
-    } finally {
-      setGuardando(false)
-    }
-  }
-
-  return (
-    <div className="dashboard-month-cell">
-      <div className="dashboard-month-content">
-        {corte && estado !== "pendiente" ? (
-          <span className="dashboard-box-status" data-state={estado}>
-            {etiqueta?.label ?? estado}
-          </span>
-        ) : corte && fechaVencimiento ? (
-          <time className="dashboard-month-date" dateTime={corte.fechaVencimiento ?? undefined}>
-            {fechaVencimiento}
-          </time>
-        ) : null}
-      </div>
-      <button
-        ref={buttonRef}
-        type="button"
-        className="dashboard-month-state-trigger"
-        aria-label="Cambiar etiqueta del mes"
-        aria-expanded={menuAbierto}
-        disabled={guardando}
-        onClick={() => setMenuAbierto((abierto) => !abierto)}
-      >
-        <i className="bx bx-chevron-down" />
-      </button>
-      {menuAbierto && (
-        <DropdownMenu buttonRef={buttonRef} onClose={() => setMenuAbierto(false)}>
-          <div className="dashboard-state-menu" aria-label="Etiquetas del mes">
-            <button
-              type="button"
-              className="dashboard-state-option dashboard-state-option-clear"
-              disabled={guardando}
-              onClick={quitarEtiqueta}
-            >
-              <i className="bx bx-x-circle dashboard-state-icon" aria-hidden="true" />
-              Ninguno
-            </button>
-            {etiquetasEstado.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                className="dashboard-state-option"
-                data-state={item.value}
-                disabled={guardando}
-                onClick={() => guardarEstado(item.value)}
-              >
-                <i className="bx bx-purchase-tag dashboard-state-icon" aria-hidden="true" />
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </DropdownMenu>
-      )}
-    </div>
-  )
-}
-
-interface ClienteModalProps {
-  cliente: Cliente
-  onClose: () => void
-  onSave: (cliente: Cliente) => void
-  onDelete: (id: number) => void
-}
-
-function ClienteModal({ cliente, onClose, onSave, onDelete }: ClienteModalProps) {
-  const [usuario, setUsuario] = useState(cliente.usuario)
-  const [cedula, setCedula] = useState(cliente.cedula ?? "")
-  const [telefono, setTelefono] = useState(cliente.telefono ?? "")
-  const [direccion, setDireccion] = useState(cliente.direccion)
-  const [referencia, setReferencia] = useState(cliente.referencia ?? "")
-  const [zonaId, setZonaId] = useState(String(cliente.zonaId))
-  const [cajaId, setCajaId] = useState(cliente.cajaId ? String(cliente.cajaId) : "")
-  const [planId, setPlanId] = useState(String(cliente.planId))
-  const [estado, setEstado] = useState(cliente.estado)
-  const [ipAsignada, setIpAsignada] = useState(cliente.ipAsignada ?? "")
-  const [zonas, setZonas] = useState<Zona[]>([])
-  const [cajas, setCajas] = useState<Caja[]>([])
-  const [planes, setPlanes] = useState<Plan[]>([])
-  const [cargando, setCargando] = useState(true)
-  const [guardando, setGuardando] = useState(false)
-  const [editando, setEditando] = useState(false)
-  const [eliminando, setEliminando] = useState(false)
-
-  useEffect(() => {
-    const cerrarConEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose()
-    }
-    document.addEventListener("keydown", cerrarConEscape)
-    document.body.style.overflow = "hidden"
-    return () => {
-      document.removeEventListener("keydown", cerrarConEscape)
-      document.body.style.overflow = ""
-    }
-  }, [onClose])
-
-  useEffect(() => {
-    Promise.all([api.zonas.getAll(), api.cajas.getAll(), api.planes.getAll()])
-      .then(([zonasData, cajasData, planesData]) => {
-        setZonas(zonasData)
-        setCajas(cajasData)
-        setPlanes(planesData)
-      })
-      .catch((error) => addToast(getErrorMessage(error, "No se pudieron cargar los datos"), "error"))
-      .finally(() => setCargando(false))
-  }, [])
-
-  const guardarCliente = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (guardando) return
-    setGuardando(true)
-
-    const data = {
-      usuario: usuario.trim(),
-      cedula: cedula.trim() || null,
-      telefono: telefono.trim() || null,
-      direccion: direccion.trim(),
-      referencia: referencia.trim() || null,
-      zonaId: Number(zonaId),
-      cajaId: cajaId ? Number(cajaId) : null,
-      planId: Number(planId),
-      estado: estado.trim(),
-      ipAsignada: ipAsignada.trim() || null,
-    }
-
-    try {
-      const actualizado = await api.clientes.update(cliente.id, data)
-      onSave({
-        ...cliente,
-        ...actualizado,
-        ...data,
-        zona: zonas.find((zona) => zona.id === data.zonaId) ?? null,
-        caja: cajas.find((caja) => caja.id === data.cajaId) ?? null,
-        plan: planes.find((plan) => plan.id === data.planId) ?? null,
-      })
-      addToast("Datos del cliente actualizados")
-      onClose()
-    } catch (error) {
-      addToast(getErrorMessage(error, "No se pudo actualizar el cliente"), "error")
-    } finally {
-      setGuardando(false)
-    }
-  }
-
-  const eliminarCliente = async () => {
-    if (!confirm("¿Eliminar este cliente y todos sus datos?")) return
-    setEliminando(true)
-    try {
-      await api.clientes.remove(cliente.id)
-      onDelete(cliente.id)
-      addToast("Cliente eliminado")
-      onClose()
-    } catch (error) {
-      addToast(getErrorMessage(error, "No se pudo eliminar el cliente"), "error")
-    } finally {
-      setEliminando(false)
-    }
-  }
-
-  return createPortal(
-    <div className="cliente-modal-backdrop" onMouseDown={(event) => {
-      if (event.target === event.currentTarget) onClose()
-    }}>
-      <section className="cliente-modal" role="dialog" aria-modal="true" aria-labelledby="cliente-modal-title">
-        <header className="cliente-modal-header">
-          <div>
-            <span className="cliente-modal-eyebrow">Ficha del cliente</span>
-            <h2 id="cliente-modal-title">{cliente.usuario}</h2>
-          </div>
-          <button type="button" className="cliente-modal-close" onClick={onClose} aria-label="Cerrar detalles">
-            <i className="bx bx-x" aria-hidden="true" />
-          </button>
-        </header>
-        <form className="cliente-modal-form" onSubmit={guardarCliente}>
-          <label className="cliente-modal-field">
-            <span>Usuario</span>
-            <input required maxLength={100} value={usuario} onChange={(event) => setUsuario(event.target.value)} disabled={!editando} />
-          </label>
-          <label className="cliente-modal-field">
-            <span>Cédula</span>
-            <input maxLength={20} value={cedula} onChange={(event) => setCedula(event.target.value)} disabled={!editando} />
-          </label>
-          <label className="cliente-modal-field">
-            <span>Teléfono</span>
-            <input type="tel" maxLength={20} value={telefono} onChange={(event) => setTelefono(event.target.value)} disabled={!editando} />
-          </label>
-          <label className="cliente-modal-field">
-            <span>Dirección</span>
-            <input required maxLength={200} value={direccion} onChange={(event) => setDireccion(event.target.value)} disabled={!editando} />
-          </label>
-          <label className="cliente-modal-field">
-            <span>Referencia</span>
-            <input maxLength={200} value={referencia} onChange={(event) => setReferencia(event.target.value)} disabled={!editando} />
-          </label>
-          <label className="cliente-modal-field">
-            <span>Zona</span>
-            <select required value={zonaId} onChange={(event) => setZonaId(event.target.value)} disabled={!editando}>
-              {zonas.map((zona) => <option key={zona.id} value={zona.id}>{zona.nombre}</option>)}
-            </select>
-          </label>
-          <label className="cliente-modal-field">
-            <span>Caja</span>
-            <select value={cajaId} onChange={(event) => setCajaId(event.target.value)} disabled={!editando}>
-              <option value="">Sin caja</option>
-              {cajas.map((caja) => <option key={caja.id} value={caja.id}>{caja.codigoCaja}</option>)}
-            </select>
-          </label>
-          <label className="cliente-modal-field">
-            <span>Plan</span>
-            <select required value={planId} onChange={(event) => setPlanId(event.target.value)} disabled={!editando}>
-              {planes.map((plan) => <option key={plan.id} value={plan.id}>{plan.nombre}</option>)}
-            </select>
-          </label>
-          <label className="cliente-modal-field">
-            <span>Estado</span>
-            <input maxLength={50} value={estado} onChange={(event) => setEstado(event.target.value)} disabled={!editando} />
-          </label>
-          <label className="cliente-modal-field">
-            <span>IP asignada</span>
-            <input value={ipAsignada} onChange={(event) => setIpAsignada(event.target.value)} disabled={!editando} />
-          </label>
-          <footer className="cliente-modal-actions">
-            {!editando ? (
-              <>
-                <button type="button" className="cliente-modal-edit" onClick={() => setEditando(true)} disabled={cargando}>
-                  <i className="bx bx-edit-alt" aria-hidden="true" />Editar
-                </button>
-                <button type="button" className="cliente-modal-delete" onClick={eliminarCliente} disabled={eliminando}>
-                  <i className="bx bx-trash" aria-hidden="true" />
-                  {eliminando ? "Eliminando..." : "Eliminar"}
-                </button>
-              </>
-            ) : (
-              <>
-                <button type="button" className="cliente-modal-cancel" onClick={() => setEditando(false)}>Cancelar</button>
-                <button type="submit" className="cliente-modal-save" disabled={guardando || cargando}>
-                  <i className={guardando ? "bx bx-loader-alt" : "bx bx-save"} aria-hidden="true" />
-                  {cargando ? "Cargando datos..." : guardando ? "Guardando..." : "Guardar cambios"}
-                </button>
-              </>
-            )}
-          </footer>
-        </form>
-      </section>
-    </div>,
-    document.body,
-  )
-}
+const columnasFijas = ["Cédula", "Usuario", "Zona", "Caja", "Corte"];
 
 function Tabla() {
-  const { mostrarMenu, toggleMenu, closeMenu, mesesSeleccionados, setMesesSeleccionados, handleCheckboxChange } = useMesesTabla()
-  const [mostrarFiltroEtiquetas, setMostrarFiltroEtiquetas] = useState(false)
-  const [mostrarResumenEtiquetas, setMostrarResumenEtiquetas] = useState(false)
-  const [etiquetasSeleccionadas, setEtiquetasSeleccionadas] = useState(etiquetasEstado.map(({ value }) => value))
-  const [busquedaUsuario, setBusquedaUsuario] = useState("")
-  const [busquedaZonaCaja, setBusquedaZonaCaja] = useState("")
-  const [clientes, setClientes] = useState<Cliente[]>([])
-  const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
-  const [cortes, setCortes] = useState<Corte[]>([])
+  const { mesesSeleccionados, setMesesSeleccionados, handleCheckboxChange } = useMesesTabla();
+  const {
+    clientes,
+    clientesFiltrados,
+    resumenEtiquetas,
+    etiquetasActivas,
+    etiquetasSeleccionadas,
+    setEtiquetasSeleccionadas,
+    toggleEtiqueta,
+    busquedaUsuario,
+    setBusquedaUsuario,
+    busquedaZonaCaja,
+    setBusquedaZonaCaja,
+    corteDelMes,
+    fechaCorteCliente,
+    guardarCorte,
+    actualizarCliente,
+    eliminarCliente,
+  } = useTablaDatos(mesesSeleccionados);
 
-  const guardarCorte = (actualizado: Corte) => {
-    setCortes((actuales) => [
-      ...actuales.filter((corte) => corte.id !== actualizado.id),
-      actualizado,
-    ])
-  }
-
-  useEffect(() => {
-    api.clientes.getAll().then(setClientes).catch(() => setClientes([]))
-    api.cortes.getAll().then(setCortes).catch(() => setCortes([]))
-  }, [])
-
-  const cortesPorCliente = useMemo(() => {
-    const mapa = new Map<number, Corte[]>()
-
-    for (const corte of cortes) {
-      const lista = mapa.get(corte.clienteId) ?? []
-      lista.push(corte)
-      mapa.set(corte.clienteId, lista)
-    }
-
-    for (const lista of mapa.values()) {
-      lista.sort((a, b) => String(b.periodo).localeCompare(String(a.periodo)))
-    }
-
-    return mapa
-  }, [cortes])
-
-  const resumenEtiquetas = useMemo(
-    () => etiquetasEstado.map((etiqueta) => ({
-      ...etiqueta,
-      cantidad: new Set(
-        cortes
-          .filter((corte) => corte.estado === etiqueta.value)
-          .map((corte) => corte.clienteId),
-      ).size,
-    })),
-    [cortes],
-  )
-  const etiquetasActivas = etiquetasSeleccionadas.length === etiquetasEstado.length
-    ? []
-    : resumenEtiquetas.filter((etiqueta) => etiquetasSeleccionadas.includes(etiqueta.value))
-
-  const columnasFijas = ["Cédula", "Usuario", "Zona", "Caja", "Corte"]
-  const mesesAMostrar = mesesSeleccionados
-
-  const monthFilterButtonRef = useRef<HTMLButtonElement | null>(null)
-  const tagFilterButtonRef = useRef<HTMLButtonElement | null>(null)
-
-  const toggleEtiqueta = (value: string) => {
-    setEtiquetasSeleccionadas((actuales) =>
-      actuales.includes(value)
-        ? actuales.filter((etiqueta) => etiqueta !== value)
-        : [...actuales, value],
-    )
-  }
-
-  const corteDelMes = (clienteId: number, mes: number) =>
-    (cortesPorCliente.get(clienteId) ?? []).find(
-      (corte) => mesDePeriodo(corte.periodo) === mes,
-    )
-
-  const fechaCorteCliente = (cliente: Cliente) => {
-    const lista = cortesPorCliente.get(cliente.id) ?? []
-    const corte = lista.find((item) => item.fechaCorte)
-    if (!corte?.fechaCorte) return "-"
-    return new Date(corte.fechaCorte).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-    })
-  }
-
-  const consultaUsuario = normalizar(busquedaUsuario)
-  const consultaZonaCaja = normalizar(busquedaZonaCaja)
-
-  const clientesFiltrados = clientes.filter((cliente) => {
-    if (consultaUsuario && !coincideUsuarioOCedula(cliente, consultaUsuario)) return false
-    if (consultaZonaCaja && !coincideZonaOCaja(cliente, consultaZonaCaja)) return false
-    if (etiquetasSeleccionadas.length === etiquetasEstado.length) return true
-    return mesesAMostrar.some((mes) => {
-      const corte = corteDelMes(cliente.id, TablaMeses.indexOf(mes) + 1)
-      if (!corte) return false
-      const estado = corte.estado === "pendiente" ? "pendiente_manual" : corte.estado
-      return etiquetasSeleccionadas.includes(estado)
-    })
-  })
+  const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
+  const [mostrarResumenEtiquetas, setMostrarResumenEtiquetas] = useState(false);
 
   return (
     <section className="dashboard-overview">
       <div className="dashboard-overview-content">
         <div className="dashboard-table-toolbar">
-          <div className="relative">
-            <button ref={monthFilterButtonRef} type="button" onClick={toggleMenu} className="dashboard-filter-button" title="Filtrar meses">
-              <i className="bx bx-filter-alt"></i>
-            </button>
-
-            {mostrarMenu && (
-              <DropdownMenu buttonRef={monthFilterButtonRef} onClose={closeMenu}>
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Filtrar meses</span>
-
-                  <div className="flex gap-1">
-                    <button onClick={() => setMesesSeleccionados([...TablaMeses])} className="dashboard-filter-all px-2 py-1 text-xs">Todos</button>
-                    <button onClick={() => setMesesSeleccionados([])} className="dashboard-filter-none px-2 py-1 text-xs">Ninguno</button>
-                  </div>
-                </div>
-
-                <div className="grid max-h-60 grid-cols-2 gap-2 overflow-y-auto">
-                  {TablaMeses.map((mes: string) => (
-                    <label key={mes} className="flex items-center space-x-2 p-1 text-sm text-gray-700 hover:bg-[#e8f4f0]">
-                      <input type="checkbox" checked={mesesSeleccionados.includes(mes)} onChange={() => handleCheckboxChange(mes)} />
-                      <span>{mes}</span>
-                    </label>
-                  ))}
-                </div>
-              </DropdownMenu>
-            )}
-          </div>
-          <div className="relative">
-            <button
-              ref={tagFilterButtonRef}
-              type="button"
-              onClick={() => setMostrarFiltroEtiquetas((abierto) => !abierto)}
-              className="dashboard-filter-button"
-              title="Filtrar etiquetas"
-              aria-label="Filtrar por etiquetas"
-              aria-expanded={mostrarFiltroEtiquetas}
-            >
-              <i className="bx bx-purchase-tag" />
-            </button>
-            {mostrarFiltroEtiquetas && (
-              <DropdownMenu buttonRef={tagFilterButtonRef} onClose={() => setMostrarFiltroEtiquetas(false)}>
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Filtrar etiquetas</span>
-                  <div className="flex gap-1">
-                    <button type="button" onClick={() => setEtiquetasSeleccionadas(etiquetasEstado.map(({ value }) => value))} className="dashboard-filter-all px-2 py-1 text-xs">Todas</button>
-                    <button type="button" onClick={() => setEtiquetasSeleccionadas([])} className="dashboard-filter-none px-2 py-1 text-xs">Ninguno</button>
-                  </div>
-                </div>
-                <div className="grid gap-1">
-                  {etiquetasEstado.map((etiqueta) => (
-                    <label key={etiqueta.value} className="dashboard-tag-filter-option">
-                      <input
-                        type="checkbox"
-                        checked={etiquetasSeleccionadas.includes(etiqueta.value)}
-                        onChange={() => toggleEtiqueta(etiqueta.value)}
-                      />
-                      <i className="bx bx-purchase-tag dashboard-state-icon" data-state={etiqueta.value} aria-hidden="true" />
-                      <span>{etiqueta.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </DropdownMenu>
-            )}
-          </div>
+          <FiltroMeses
+            mesesSeleccionados={mesesSeleccionados}
+            onToggleMes={handleCheckboxChange}
+            onTodos={() => setMesesSeleccionados([...TablaMeses])}
+            onNinguno={() => setMesesSeleccionados([])}
+          />
+          <FiltroEtiquetas
+            etiquetasSeleccionadas={etiquetasSeleccionadas}
+            onToggleEtiqueta={toggleEtiqueta}
+            onTodas={() => setEtiquetasSeleccionadas(todosLosValores())}
+            onNinguna={() => setEtiquetasSeleccionadas([])}
+          />
           <input
             className="dashboard-table-search"
             type="search"
@@ -569,13 +89,13 @@ function Tabla() {
                     {col}
                   </th>
                 ))}
-                {mesesAMostrar.map((mes) => (
+                {mesesSeleccionados.map((mes) => (
                   <th key={mes}>
                     {mes}
                   </th>
                 ))}
               </tr>
-              
+
             </thead>
 
             <tbody>
@@ -599,9 +119,9 @@ function Tabla() {
                   <td>{c.zona?.nombre || '-'}</td>
                   <td>{c.caja?.codigoCaja || '-'}</td>
                   <td>{fechaCorteCliente(c)}</td>
-                  {mesesAMostrar.map((mes) => {
-                    const numeroMes = TablaMeses.indexOf(mes) + 1
-                    const corte = corteDelMes(c.id, numeroMes)
+                  {mesesSeleccionados.map((mes) => {
+                    const numeroMes = TablaMeses.indexOf(mes) + 1;
+                    const corte = corteDelMes(c.id, numeroMes);
 
                     return (
                       <td key={mes} className="dashboard-month-td">
@@ -612,14 +132,14 @@ function Tabla() {
                           onSave={guardarCorte}
                         />
                       </td>
-                    )
+                    );
                   })}
                 </tr>
               ))}
               {clientesFiltrados.length === 0 && (
                 <tr>
                   <td
-                    colSpan={columnasFijas.length + mesesAMostrar.length}
+                    colSpan={columnasFijas.length + mesesSeleccionados.length}
                     className="dashboard-table-empty"
                   >
                     No se encontraron clientes
@@ -636,75 +156,28 @@ function Tabla() {
             cliente={clienteSeleccionado}
             onClose={() => setClienteSeleccionado(null)}
             onSave={(actualizado) => {
-              setClientes((actuales) => actuales.map((cliente) => cliente.id === actualizado.id ? actualizado : cliente))
-              setClienteSeleccionado(null)
+              actualizarCliente(actualizado);
+              setClienteSeleccionado(null);
             }}
             onDelete={(id) => {
-              setClientes((actuales) => actuales.filter((cliente) => cliente.id !== id))
-              setClienteSeleccionado(null)
+              eliminarCliente(id);
+              setClienteSeleccionado(null);
             }}
           />
         )}
 
-        <div className="dashboard-label-summary">
-          {mostrarResumenEtiquetas && (
-            <section
-              id="dashboard-label-summary-panel"
-              className="dashboard-label-summary-panel"
-              aria-label="Resumen de usuarios por etiqueta"
-            >
-              <header className="dashboard-label-summary-header">
-                <h2>Usuarios por etiqueta</h2>
-                <button
-                  type="button"
-                  className="dashboard-label-summary-close"
-                  aria-label="Cerrar resumen de etiquetas"
-                  onClick={() => setMostrarResumenEtiquetas(false)}
-                >
-                  <i className="bx bx-x" aria-hidden="true" />
-                </button>
-              </header>
-              <ul className="dashboard-label-summary-list">
-                {resumenEtiquetas.map((etiqueta) => (
-                  <li key={etiqueta.value}>
-                    <span className="dashboard-label-summary-name">
-                      <span className="dashboard-label-dot" data-state={etiqueta.value} aria-hidden="true" />
-                      {etiqueta.label}
-                    </span>
-                    <strong>{etiqueta.cantidad}</strong>
-                  </li>
-                ))}
-                <li className="dashboard-label-summary-total">
-                  <span>Total de clientes</span>
-                  <strong>{clientes.length}</strong>
-                </li>
-              </ul>
-            </section>
-          )}
-          <div className="dashboard-label-summary-dock">
-            {etiquetasActivas.map((etiqueta) => (
-              <span key={etiqueta.value} className="dashboard-label-selected-chip">
-                <span className="dashboard-label-dot" data-state={etiqueta.value} aria-hidden="true" />
-                <span>{etiqueta.label}</span>
-                <strong>{etiqueta.cantidad}</strong>
-              </span>
-            ))}
-            <button
-              type="button"
-              className="dashboard-label-summary-trigger"
-              aria-label={mostrarResumenEtiquetas ? "Cerrar resumen de etiquetas" : "Ver usuarios por etiqueta"}
-              aria-expanded={mostrarResumenEtiquetas}
-              aria-controls="dashboard-label-summary-panel"
-              onClick={() => setMostrarResumenEtiquetas((abierto) => !abierto)}
-            >
-              <i className={mostrarResumenEtiquetas ? "bx bx-x" : "bx bx-purchase-tag"} aria-hidden="true" />
-            </button>
-          </div>
-        </div>
+        <ResumenEtiquetas
+          resumen={resumenEtiquetas}
+          etiquetasActivas={etiquetasActivas}
+          totalClientes={clientes.length}
+          abierto={mostrarResumenEtiquetas}
+          onToggle={() => setMostrarResumenEtiquetas((abierto) => !abierto)}
+          onClose={() => setMostrarResumenEtiquetas(false)}
+        />
 
       </div>
     </section>
-  )
+  );
 }
 
-export default Tabla
+export default Tabla;

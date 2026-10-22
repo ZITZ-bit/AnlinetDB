@@ -4,7 +4,7 @@ import { translatePrismaError } from '../prisma/prisma-errors';
 import { CreateCorteDto } from './dto/create-corte.dto';
 import { UpdateCorteDto } from './dto/update-corte.dto';
 
-export const DIAS_GRACIA_CORTE = 5;
+export const DIAS_GRACIA_CORTE = 4;
 
 @Injectable()
 export class CortesService {

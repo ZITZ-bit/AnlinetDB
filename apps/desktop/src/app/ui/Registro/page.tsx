@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/ts/use-auth';
+import { useAuth } from '@/hooks/use-auth';
 import "../../../styles/registro.css";
+import "../../../styles/auth.css";
 
 export default function Registro() {
   const router = useRouter();
@@ -45,13 +46,13 @@ export default function Registro() {
   };
 
   return (
-    <main className="registro-container">
-      <form className="registro-card" onSubmit={handleSubmit}>
+    <main className="auth-container">
+      <form className="auth-card auth-card--wide" onSubmit={handleSubmit}>
         <h1>Crear cuenta</h1>
-        <p className="subtitle">Registro de usuario</p>
+        <p className="auth-subtitle">Registro de usuario</p>
 
         {(error || formError) && (
-          <p className="registro-notice registro-notice-error" role="alert">
+          <p className="auth-notice auth-notice--error" role="alert">
             {error || formError}
           </p>
         )}
@@ -126,17 +127,17 @@ export default function Registro() {
 
         <button
           type="submit"
-          className="registro-btn"
+          className="auth-button"
           disabled={loading}
         >
           {loading ? 'Registrando...' : 'Crear cuenta'}
         </button>
 
-          <p className="registro-redirect">
+          <p className="auth-redirect">
             ¿Ya tienes cuenta? <Link href="/">Inicia sesión</Link>
           </p>
 
-        <span className="registro-footer">© 2026 Anlinet</span>
+        <span className="auth-footer">© 2026 Anlinet</span>
       </form>
     </main>
   );

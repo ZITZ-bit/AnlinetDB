@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
-import './RegistrarZona.css';
+import '../../styles/form-kit.css';
 import { api, getErrorMessage } from '../../lib/api';
-import { useToast } from '../../components/Toast/use-toast';
+import { useToast } from '../../components/toast/use-toast';
 
 export default function RegistrarZona() {
   const [nombre, setNombre] = useState('');
@@ -38,16 +38,16 @@ export default function RegistrarZona() {
   };
 
   return (
-    <div className="rz-container">
-      <div className="rz-card">
+    <div className="form-kit">
+      <div className="form-kit__card">
         <h1>Registrar Zona</h1>
-        <p className="rz-subtitle">
+        <p className="form-kit__subtitle">
           Agregar nuevas zonas para la cobertura de fibra óptica
         </p>
 
-        <form className="rz-form-grid" onSubmit={handleSubmit}>
-          <div className="rz-left-column">
-            <div className="rz-input-group">
+        <form className="form-kit__grid form-kit__grid--single" onSubmit={handleSubmit}>
+          <div className="form-kit__column form-kit__column--narrow">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -61,7 +61,7 @@ export default function RegistrarZona() {
               </label>
             </div>
 
-            <div className="rz-input-group">
+            <div className="form-kit__field">
               <label>
                 <input
                   type="text"
@@ -75,8 +75,8 @@ export default function RegistrarZona() {
             </div>
           </div>
 
-          <div className="rz-full-width">
-            <button type="submit" className="rz-btn-primary" disabled={loading}>
+          <div className="form-kit__actions">
+            <button type="submit" className="form-kit__button" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar Zona'}
             </button>
           </div>

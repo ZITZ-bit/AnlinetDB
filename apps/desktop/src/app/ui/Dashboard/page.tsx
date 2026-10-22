@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import Navbar from "@/components/Navbar";
 import Tabla from "@/components/Tabla";
-import VerCajas from "@/components/VerCajas";
+import VerCajas from "@/features/VerCajas/VerCajas";
 import Estadisticas from "@/components/Estadisticas";
 
 import RegistroCliente from "@/features/RegistroCliente/RegistroCliente";
