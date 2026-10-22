@@ -1,6 +1,6 @@
 {
   "name": "desktop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AnlinetDB Desktop - Electron + Next.js",
   "author": "ZITZ-bit",
   "private": true,
@@ -12,6 +12,7 @@
     "build": "next build && node scripts/prepare-standalone.js",
     "start": "next start",
     "lint": "eslint",
+    "prepackage": "node scripts/prepare-api-runtime.js",
     "package": "electron-builder --win --publish never"
   },
   "dependencies": {
@@ -55,6 +56,11 @@
       {
         "from": "../lib/",
         "to": "lib/",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../api/runtime",
+        "to": "api",
         "filter": ["**/*"]
       }
     ],

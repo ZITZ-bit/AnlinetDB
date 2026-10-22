@@ -12,6 +12,9 @@ async function bootstrap() {
   });
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  await app.listen(process.env.PORT ?? 3002);
+  await app.listen(
+    Number(process.env.PORT ?? 3002),
+    process.env.HOST ?? "127.0.0.1",
+  );
 }
 void bootstrap();

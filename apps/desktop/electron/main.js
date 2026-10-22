@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require("electron");
+const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 const http = require("http");
@@ -15,18 +16,19 @@ require(path.join(getLibPath(), "core", "scripts", "windowControls.js"));
 let mainWindow;
 let splash;
 let nextProcess;
+let apiProcess;
 
 function waitForServer(port, retries = 50) {
   return new Promise((resolve, reject) => {
     let attempt = 0;
     const check = () => {
-      const req = http.request(`http://localhost:${port}/`, (res) => {
+      const req = http.request(`http://127.0.0.1:${port}/`, (res) => {
         if (res.statusCode < 500) {
           resolve();
         } else {
           attempt++;
           if (attempt >= retries) {
-            reject(new Error("Next.js server did not start in time"));
+            reject(new Error(`Server on port ${port} did not start in time`));
           } else {
             setTimeout(check, 200);
           }
@@ -35,7 +37,7 @@ function waitForServer(port, retries = 50) {
       req.on("error", () => {
         attempt++;
         if (attempt >= retries) {
-          reject(new Error("Next.js server did not start in time"));
+          reject(new Error(`Server on port ${port} did not start in time`));
         } else {
           setTimeout(check, 200);
         }
@@ -89,6 +91,54 @@ function startNextServer(port) {
   });
 }
 
+function getApiDir() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, "api");
+  }
+  return path.join(__dirname, "..", "..", "api");
+}
+
+function startApiServer(port) {
+  return new Promise((resolve, reject) => {
+    const apiDir = getApiDir();
+    const nodeExe = path.join(apiDir, "node.exe");
+    const serverPath = path.join(apiDir, "dist", "main.js");
+
+    // La base de datos vive en userData para que sea escribible y persista
+    // entre actualizaciones. En el primer arranque se copia la base incluida.
+    const dataDir = path.join(app.getPath("userData"), "data");
+    fs.mkdirSync(dataDir, { recursive: true });
+
+    const databasePath = path.join(dataDir, "anlinet.db");
+    if (!fs.existsSync(databasePath)) {
+      fs.copyFileSync(
+        path.join(apiDir, "prisma", "database", "dev.db"),
+        databasePath,
+      );
+    }
+
+    apiProcess = spawn(nodeExe, [serverPath], {
+      stdio: "inherit",
+      cwd: apiDir,
+      windowsHide: true,
+      env: {
+        ...process.env,
+        PORT: String(port),
+        HOST: "127.0.0.1",
+        DATABASE_URL: `file:${databasePath}`,
+      },
+    });
+
+    apiProcess.on("error", (err) => {
+      reject(err);
+    });
+
+    waitForServer(port)
+      .then(() => resolve())
+      .catch((err) => reject(err));
+  });
+}
+
 function createWindow() {
   const libPath = getLibPath();
 
@@ -122,12 +172,13 @@ function createWindow() {
 
   if (app.isPackaged) {
     const PORT = process.env.NEXT_PORT || 3000;
-    startNextServer(PORT)
+    const API_PORT = process.env.API_PORT || 3002;
+    Promise.all([startNextServer(PORT), startApiServer(API_PORT)])
       .then(() => {
         mainWindow.loadURL(`http://localhost:${PORT}`);
       })
       .catch((err) => {
-        console.error("Failed to start Next.js server:", err.message);
+        console.error("Failed to start application servers:", err.message);
         app.quit();
       });
   } else {
@@ -158,5 +209,8 @@ app.on("window-all-closed", () => {
 app.on("before-quit", () => {
   if (nextProcess) {
     nextProcess.kill();
+  }
+  if (apiProcess) {
+    apiProcess.kill();
   }
 });
