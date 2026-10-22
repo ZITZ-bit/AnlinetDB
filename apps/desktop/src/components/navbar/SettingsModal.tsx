@@ -227,7 +227,7 @@ export function SettingsModal({ onClose, developerMode, onDeveloperModeChange }:
                 <strong className="text-sm text-[#18342f]">AnlinetDB Desktop</strong>
                 <p className="text-sm text-[#657570]">Versión actual</p>
               </div>
-              <button type="button" className={`${buttonMotion} inline-flex shrink-0 items-center gap-2 border border-[#d7e2de] px-4 py-2 text-sm font-medium text-[#025f51] hover:bg-[#e8f4f0] max-sm:px-2.5`}>
+              <button type="button" onClick={async () => { const r = await (window as any).api?.updateApp?.(); alert(r?.ok ? "Actualizado" : "Error: " + (r?.error || "")); }} className={`${buttonMotion} inline-flex shrink-0 items-center gap-2 border border-[#d7e2de] px-4 py-2 text-sm font-medium text-[#025f51] hover:bg-[#e8f4f0] max-sm:px-2.5`}>
                 <HiArrowPath aria-hidden="true" />
                 <span>Buscar actualización</span>
               </button>

@@ -4,4 +4,5 @@ contextBridge.exposeInMainWorld("api", {
     minimize: () => ipcRenderer.send("minimize"),
     maximize: () => ipcRenderer.send("maximize"),
     close: () => ipcRenderer.send("close"),
+    updateApp: () => ipcRenderer.invoke("update-app"),
 });
