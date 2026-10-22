@@ -1,8 +1,9 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import '../../styles/form-kit.css';
 import { api, getErrorMessage, type Caja, type Plan, type Zona } from '../../lib/api';
 import { useToast } from '../../components/toast/use-toast';
+import { useRefrescarDatos } from '../../hooks/datos/useRefrescarDatos';
 import { periodoActual, vencimientoActual } from '../../lib/corte';
 
 function fechaLocal(date: Date): string {
@@ -32,10 +33,7 @@ export default function RegistroCliente() {
   const { showToast } = useToast();
   const catalogosCargados = useRef(false);
 
-  useEffect(() => {
-    if (catalogosCargados.current) return;
-    catalogosCargados.current = true;
-
+  const cargarCatalogos = useCallback(() => {
     Promise.all([
       api.zonas.getAll().catch(() => []),
       api.planes.getAll().catch(() => []),
@@ -55,6 +53,14 @@ export default function RegistroCliente() {
       })
       .finally(() => setCargandoCatalogos(false));
   }, [showToast]);
+
+  useEffect(() => {
+    if (catalogosCargados.current) return;
+    catalogosCargados.current = true;
+    cargarCatalogos();
+  }, [cargarCatalogos]);
+
+  useRefrescarDatos(cargarCatalogos);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

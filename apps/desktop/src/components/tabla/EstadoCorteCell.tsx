@@ -40,7 +40,7 @@ export function EstadoCorteCell({ cliente, mes, corte, onSave }: EstadoCorteCell
             clienteId: cliente.id,
             monto: cliente.plan?.precio ?? 0,
             periodo,
-            fechaVencimiento: null,
+            fechaVencimiento: new Date().toISOString(),
             estado: estadoSeleccionado,
           });
 
@@ -76,14 +76,14 @@ export function EstadoCorteCell({ cliente, mes, corte, onSave }: EstadoCorteCell
   return (
     <div className="dashboard-month-cell">
       <div className="dashboard-month-content">
-        {corte && estado !== "pendiente" ? (
-          <span className="estado-badge" data-state={estado}>
-            {etiqueta?.label ?? estado}
-          </span>
-        ) : corte && fechaVencimiento ? (
+        {corte && fechaVencimiento ? (
           <time className="dashboard-month-date" dateTime={corte.fechaVencimiento ?? undefined}>
             {fechaVencimiento}
           </time>
+        ) : corte && estado !== "pendiente" ? (
+          <span className="estado-badge" data-state={estado}>
+            {etiqueta?.label ?? estado}
+          </span>
         ) : null}
       </div>
       <button

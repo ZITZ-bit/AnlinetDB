@@ -3,12 +3,13 @@ import { PrismaService } from '../prisma/prisma.service';
 import { translatePrismaError } from '../prisma/prisma-errors';
 import { CreateCorteDto } from './dto/create-corte.dto';
 import { UpdateCorteDto } from './dto/update-corte.dto';
+import { TiempoService } from '../common/tiempo.service';
 
-export const DIAS_GRACIA_CORTE = 4;
+export const DIAS_GRACIA_CORTE = 0;
 
 @Injectable()
 export class CortesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private tiempo: TiempoService) {}
 
   async create(createCorteDto: CreateCorteDto, usuarioId: number) {
     try {
@@ -62,7 +63,7 @@ export class CortesService {
       },
     });
 
-    const ahora = Date.now();
+    const ahora = this.tiempo.ahoraMs();
     const vencidos = cortes.filter(
       (corte) => corte.fechaCorte && new Date(corte.fechaCorte).getTime() <= ahora,
     );

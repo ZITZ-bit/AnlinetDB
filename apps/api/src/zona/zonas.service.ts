@@ -71,4 +71,33 @@ export class ZonasService {
       where: { id },
     });
   }
+
+  async limpiar(usuarioId: number) {
+    return this.prisma.$transaction(async (tx) => {
+      const clientes = await tx.cliente.findMany({
+        where: { propietarioId: usuarioId },
+        select: { id: true },
+      });
+
+      const clienteIds = clientes.map((cliente) => cliente.id);
+
+      const cortes = await tx.corte.deleteMany({
+        where: { clienteId: { in: clienteIds } },
+      });
+
+      const clientesEliminados = await tx.cliente.deleteMany({
+        where: { id: { in: clienteIds } },
+      });
+
+      const zonas = await tx.zona.deleteMany({
+        where: { usuarioId },
+      });
+
+      return {
+        zonas: zonas.count,
+        clientes: clientesEliminados.count,
+        cortes: cortes.count,
+      };
+    });
+  }
 }

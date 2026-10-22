@@ -162,13 +162,13 @@ export async function apiFetch<T = unknown>(path: string, options?: RequestInit)
 export const api = {
   zonas: {
     getAll: () => apiFetch<Zona[]>('/zonas'),
-    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
+    remove: (id: number) => apiFetch<void>(`/zonas/${id}`, { method: 'DELETE' }),
     create: (data: { nombre: string; descripcion?: string }) =>
       apiFetch<Zona>('/zonas', { method: 'POST', body: JSON.stringify(data) }),
   },
   planes: {
     getAll: () => apiFetch<Plan[]>('/planes'),
-    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
+    remove: (id: number) => apiFetch<void>(`/planes/${id}`, { method: 'DELETE' }),
     create: (data: {
       nombre: string;
       velocidad?: string;
@@ -178,7 +178,7 @@ export const api = {
   },
   cajas: {
     getAll: () => apiFetch<Caja[]>('/cajas'),
-    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
+    remove: (id: number) => apiFetch<void>(`/cajas/${id}`, { method: 'DELETE' }),
     create: (data: {
       codigoCaja: string;
       direccion?: string;
@@ -223,7 +223,7 @@ export const api = {
   },
   cortes: {
     getAll: () => apiFetch<Corte[]>('/cortes'),
-    remove: (id: number) => apiFetch<void>(`/clientes/${id}`, { method: 'DELETE' }),
+    remove: (id: number) => apiFetch<void>(`/cortes/${id}`, { method: 'DELETE' }),
     create: (data: {
       clienteId: number;
       monto: number;

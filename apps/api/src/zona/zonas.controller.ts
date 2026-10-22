@@ -44,6 +44,11 @@ export class ZonasController {
     return this.zonasService.update(id, updateZonaDto, req.user.userId);
   }
 
+  @Delete('limpieza')
+  limpiar(@Req() req: any) {
+    return this.zonasService.limpiar(req.user.userId);
+  }
+
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     return this.zonasService.remove(id, req.user.userId);

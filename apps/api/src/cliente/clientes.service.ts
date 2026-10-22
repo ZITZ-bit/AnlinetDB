@@ -64,8 +64,23 @@ export class ClientesService {
   async remove(id: number, usuarioId: number) {
     await this.findOne(id, usuarioId);
 
-    return this.prisma.cliente.delete({
-      where: { id },
+    return this.prisma.$transaction(async (tx) => {
+      await tx.corte.deleteMany({ where: { clienteId: id } });
+      return tx.cliente.delete({ where: { id } });
+    });
+  }
+
+  async limpiar(usuarioId: number) {
+    return this.prisma.$transaction(async (tx) => {
+      const cortes = await tx.corte.deleteMany({
+        where: { usuarioId },
+      });
+
+      const clientes = await tx.cliente.deleteMany({
+        where: { propietarioId: usuarioId },
+      });
+
+      return { clientes: clientes.count, cortes: cortes.count };
     });
   }
 }

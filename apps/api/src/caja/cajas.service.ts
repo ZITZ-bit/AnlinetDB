@@ -59,4 +59,19 @@ export class CajasService {
       where: { id },
     });
   }
+
+  async limpiar(usuarioId: number) {
+    return this.prisma.$transaction(async (tx) => {
+      const desasociados = await tx.cliente.updateMany({
+        where: { propietarioId: usuarioId, cajaId: { not: null } },
+        data: { cajaId: null },
+      });
+
+      const cajas = await tx.caja.deleteMany({
+        where: { usuarioId },
+      });
+
+      return { cajas: cajas.count, clientesDesasociados: desasociados.count };
+    });
+  }
 }

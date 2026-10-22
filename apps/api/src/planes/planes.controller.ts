@@ -49,6 +49,11 @@ export class PlanesController {
     return this.planesService.update(id, updatePlanDto, req.user.userId);
   }
 
+  @Delete('limpieza')
+  limpiar(@Req() req: any) {
+    return this.planesService.limpiar(req.user.userId);
+  }
+
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     return this.planesService.remove(id, req.user.userId);

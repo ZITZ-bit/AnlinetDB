@@ -5,6 +5,7 @@ import 'boxicons/css/boxicons.min.css';
 import './VerCajas.css';
 import '../../styles/estado-badge.css';
 import { api, type Caja } from '../../lib/api';
+import { useRefrescarDatos } from '../../hooks/datos/useRefrescarDatos';
 
 const ESTADO_POR_DEFECTO = 'disponible';
 
@@ -20,7 +21,7 @@ export default function VerCajas() {
   const [cajas, setCajas] = useState<Caja[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const cargarCajas = () => {
     let activo = true;
 
     api.cajas
@@ -38,7 +39,13 @@ export default function VerCajas() {
     return () => {
       activo = false;
     };
+  };
+
+  useEffect(() => {
+    cargarCajas();
   }, []);
+
+  useRefrescarDatos(cargarCajas);
 
   if (loading) {
     return (

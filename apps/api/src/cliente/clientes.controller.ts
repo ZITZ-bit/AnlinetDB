@@ -44,6 +44,11 @@ export class ClientesController {
     return this.clientesService.update(id, updateClienteDto, req.user.userId);
   }
 
+  @Delete('limpieza')
+  limpiar(@Req() req: any) {
+    return this.clientesService.limpiar(req.user.userId);
+  }
+
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     return this.clientesService.remove(id, req.user.userId);

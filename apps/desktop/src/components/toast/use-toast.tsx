@@ -4,7 +4,7 @@ import { useCallback, useSyncExternalStore, memo } from 'react';
 export interface Toast {
   id: string;
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'warning';
 }
 
 type Listener = () => void;
@@ -26,7 +26,7 @@ function getSnapshot() {
   return toasts;
 }
 
-export function addToast(message: string, type: 'success' | 'error' | 'info' = 'info') {
+export function addToast(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') {
   const id = Date.now().toString() + Math.random().toString(36).slice(2, 7);
   const item: Toast = { id, message, type };
   toasts = [...toasts, item];
@@ -42,7 +42,7 @@ export function removeToast(id: string) {
 export function useToast() {
   const current = useSyncExternalStore(subscribe, getSnapshot, () => emptyToasts);
 
-  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
     addToast(message, type);
   }, []);
 
@@ -65,12 +65,17 @@ const estilosPorTipo = {
     borde: 'border-l-[#4d7891]',
     icono: 'text-[#4d7891]',
   },
+  warning: {
+    borde: 'border-l-[#c58a2d]',
+    icono: 'text-[#a96f13]',
+  },
 } as const;
 
 const iconosPorTipo = {
   success: '✓',
   error: '✕',
   info: 'ℹ',
+  warning: '⚠',
 } as const;
 
 export function ToastContainer({ current }: { current: Toast[] }) {
@@ -79,7 +84,7 @@ export function ToastContainer({ current }: { current: Toast[] }) {
       {current.map((toast) => (
         <div
           key={toast.id}
-          role={toast.type === 'error' ? 'alert' : 'status'}
+          role={toast.type === 'error' || toast.type === 'warning' ? 'alert' : 'status'}
           aria-live="polite"
           className={`pointer-events-auto flex animate-toast-in items-center gap-3 rounded-[5px] border border-black/[0.08] border-l-[3px] bg-white px-3.5 py-3 text-sm font-medium leading-[1.45] text-[#243430] shadow-[0_8px_24px_rgba(23,42,38,0.12)] ${estilosPorTipo[toast.type].borde}`}
         >

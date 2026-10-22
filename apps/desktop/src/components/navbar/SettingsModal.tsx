@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { HiAdjustmentsHorizontal, HiArchiveBox, HiArrowDownTray, HiArrowPath, HiBell, HiCheck, HiChevronDown, HiClock, HiPaintBrush } from "react-icons/hi2";
+import { HiAdjustmentsHorizontal, HiArchiveBox, HiArrowDownTray, HiArrowPath, HiBell, HiCheck, HiChevronDown, HiClock, HiCodeBracket, HiPaintBrush } from "react-icons/hi2";
 
 interface SettingsModalProps {
   onClose: () => void;
+  developerMode: boolean;
+  onDeveloperModeChange: (enabled: boolean) => void;
 }
 
-export function SettingsModal({ onClose }: SettingsModalProps) {
-  const [activeTab, setActiveTab] = useState<"temas" | "backups" | "actualizacion">("temas");
+export function SettingsModal({ onClose, developerMode, onDeveloperModeChange }: SettingsModalProps) {
+  const [activeTab, setActiveTab] = useState<"sistema" | "temas" | "backups" | "actualizacion">("sistema");
   const [selectedTheme, setSelectedTheme] = useState("Claro");
   const [backupFrequency, setBackupFrequency] = useState("Cada semana");
   const [frequencyMenuOpen, setFrequencyMenuOpen] = useState(false);
@@ -57,6 +59,9 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         </header>
 
         <nav className="flex shrink-0 gap-1 border-b border-[#d7e2de] bg-[#f6f9f7] px-6 pt-2 max-sm:px-3" role="tablist" aria-label="Secciones de ajustes">
+          <button type="button" role="tab" aria-selected={activeTab === "sistema"} onClick={() => setActiveTab("sistema")} className={`${buttonMotion} flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold max-sm:px-2.5 ${activeTab === "sistema" ? "border-[#025f51] text-[#025f51]" : "border-transparent text-[#657570] hover:text-[#18342f]"}`}>
+            <HiAdjustmentsHorizontal aria-hidden="true" /><span className="max-sm:hidden">Sistema</span><span className="sm:hidden">Sis.</span>
+          </button>
           <button type="button" role="tab" aria-selected={activeTab === "temas"} onClick={() => setActiveTab("temas")} className={`${buttonMotion} flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold max-sm:px-2.5 ${activeTab === "temas" ? "border-[#025f51] text-[#025f51]" : "border-transparent text-[#657570] hover:text-[#18342f]"}`}>
             <HiPaintBrush aria-hidden="true" />Temas
           </button>
@@ -69,8 +74,34 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         </nav>
 
         <div className="flex min-h-[350px] flex-col gap-4 overflow-y-auto px-6 py-5 max-sm:min-h-[320px] max-sm:px-4 max-sm:py-4">
-          {activeTab === "temas" && <section className="border border-[#d7e2de] bg-white" aria-labelledby="settings-theme-title" role="tabpanel">
-            <div className="flex items-start justify-between gap-4 border-b border-[#e3ebe7] px-5 py-4">
+          {activeTab === "sistema" && <section className="flex flex-col" aria-labelledby="settings-system-title" role="tabpanel">
+            <div className="pb-4">
+              <h3 id="settings-system-title" className="text-base font-semibold text-[#18342f]">Opciones del sistema</h3>
+              <p className="mt-1 text-sm text-[#657570]">Controla las herramientas disponibles en la aplicación</p>
+            </div>
+            <div className="flex items-center gap-4 border-y border-[#e3ebe7] py-5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#f0eafa] text-[#7040b8]">
+                <HiCodeBracket aria-hidden="true" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <strong className="text-sm text-[#18342f]">Modo desarrollador</strong>
+                <p className="text-sm text-[#657570]">Muestra u oculta el acceso Desarrollador en el navbar</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={developerMode}
+                aria-label="Modo desarrollador"
+                onClick={() => onDeveloperModeChange(!developerMode)}
+                className={`${buttonMotion} relative inline-flex h-6 w-11 shrink-0 items-center rounded-full ${developerMode ? "justify-end bg-[#7040b8]" : "justify-start bg-[#d6dcd8]"}`}
+              >
+                <span className="mx-1 h-4 w-4 rounded-full bg-white shadow transition-transform duration-150" />
+              </button>
+            </div>
+          </section>}
+
+          {activeTab === "temas" && <section className="flex flex-col" aria-labelledby="settings-theme-title" role="tabpanel">
+            <div className="flex items-start justify-between gap-4 border-b border-[#e3ebe7] pb-4">
               <div>
                 <h3 id="settings-theme-title" className="text-base font-semibold text-[#18342f]">
                   Temas
@@ -81,7 +112,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                 INTERFAZ
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-3 px-5 py-4 max-sm:gap-2 max-sm:px-3">
+            <div className="grid grid-cols-3 gap-3 py-4 max-sm:gap-2">
               <button type="button" onClick={() => setSelectedTheme("Claro")} aria-pressed={selectedTheme === "Claro"} className={`${buttonMotion} group relative flex flex-col items-center gap-3 border px-4 py-4 text-center ${selectedTheme === "Claro" ? "border-[#358568] bg-[#f3f8f5] shadow-[0_0_0_2px_rgba(53,133,104,0.1)]" : "border-[#d7e2de] bg-white hover:border-[#9bb9ae]"}`}>
                 <span className="flex h-16 w-24 flex-col overflow-hidden rounded-lg border border-[#e5e7eb] bg-white shadow-inner">
                   <span className="h-3 w-full bg-[#f8fafc]" />
@@ -127,8 +158,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             </div>
           </section>}
 
-          {activeTab === "backups" && <section className="border border-[#d7e2de] bg-white" aria-labelledby="settings-backup-title" role="tabpanel">
-            <div className="flex items-start justify-between gap-4 border-b border-[#e3ebe7] px-5 py-4">
+          {activeTab === "backups" && <section className="flex flex-col" aria-labelledby="settings-backup-title" role="tabpanel">
+            <div className="flex items-start justify-between gap-4 border-b border-[#e3ebe7] pb-4">
               <div>
                 <h3 id="settings-backup-title" className="text-base font-semibold text-[#18342f]">
                   Copias de seguridad
@@ -137,8 +168,8 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               </div>
               <HiArchiveBox className="mt-1 text-xl text-[#025f51]" aria-hidden="true" />
             </div>
-            <div className="flex flex-col divide-y divide-[#edf1ee]">
-              <div className="flex items-center gap-4 px-5 py-4 max-sm:flex-wrap max-sm:px-4">
+            <div className="flex flex-col divide-y divide-[#e3ebe7]">
+              <div className="flex items-center gap-4 py-4 max-sm:flex-wrap">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#e8f4f0] text-[#025f51]"><HiArchiveBox aria-hidden="true" /></span>
                 <div className="min-w-0 flex-1">
                   <strong className="text-sm text-[#18342f]">Crear copia ahora</strong>
@@ -146,7 +177,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                 </div>
                 <button type="button" className={`${buttonMotion} inline-flex items-center gap-2 border border-[#d7e2de] px-3 py-2 text-sm font-semibold text-[#025f51] hover:bg-[#e8f4f0] max-sm:ml-14`}><HiArchiveBox aria-hidden="true" />Crear backup</button>
               </div>
-              <div className="flex items-center gap-4 px-5 py-4 max-sm:flex-wrap max-sm:px-4">
+              <div className="flex items-center gap-4 py-4 max-sm:flex-wrap">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#e8f4f0] text-[#025f51]"><HiArrowDownTray aria-hidden="true" /></span>
                 <div className="min-w-0 flex-1">
                   <strong className="text-sm text-[#18342f]">Importar backup</strong>
@@ -154,7 +185,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                 </div>
                 <button type="button" className={`${buttonMotion} inline-flex items-center gap-2 border border-[#d7e2de] px-3 py-2 text-sm font-semibold text-[#025f51] hover:bg-[#e8f4f0] max-sm:ml-14`}><HiArrowDownTray aria-hidden="true" />Importar archivo</button>
               </div>
-              <div className="flex items-center gap-4 px-5 py-4 max-sm:px-4">
+              <div className="flex items-center gap-4 py-4 max-sm:flex-wrap">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#e8f4f0] text-[#025f51]"><HiClock aria-hidden="true" /></span>
                 <div className="min-w-0 flex-1">
                   <strong className="text-sm text-[#18342f]">Backups automáticos</strong>
@@ -178,17 +209,17 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 border-t border-[#e3ebe7] bg-[#f7faf8] px-5 py-3 text-xs text-[#657570] max-sm:px-4">
+            <div className="flex items-center gap-2 border-t border-[#e3ebe7] py-3 text-xs text-[#657570]">
               <HiBell aria-hidden="true" className="shrink-0 text-[#025f51]" />Los controles son solo visuales; no se realizan copias ni importaciones.
             </div>
           </section>}
 
-          {activeTab === "actualizacion" && <section className="border border-[#d7e2de] bg-white" aria-labelledby="settings-updates-title" role="tabpanel">
-            <div className="border-b border-[#e3ebe7] px-5 py-4">
+          {activeTab === "actualizacion" && <section className="flex flex-col" aria-labelledby="settings-updates-title" role="tabpanel">
+            <div className="border-b border-[#e3ebe7] pb-4">
               <h3 id="settings-updates-title" className="text-base font-semibold text-[#18342f]">Actualizaciones</h3>
               <p className="mt-1 text-sm text-[#657570]">Información de versión de AnlinetDB Desktop</p>
             </div>
-            <div className="flex items-center gap-4 px-5 py-4 max-sm:gap-3 max-sm:px-4">
+            <div className="flex items-center gap-4 py-4 max-sm:gap-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#e8f4f0] text-[#025f51]">
                 <HiArrowPath aria-hidden="true" />
               </div>

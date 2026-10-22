@@ -9,9 +9,10 @@ import { ZonasModule } from './zona/zona.module';
 import { CorteModule } from './corte/corte.module';
 import { ClientesModule } from './cliente/cliente.module';
 import { CajaModule } from './caja/caja.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, PlanesModule, ZonasModule, CorteModule, ClientesModule, CajaModule],
+  imports: [PrismaModule, UsersModule, AuthModule, PlanesModule, ZonasModule, CorteModule, ClientesModule, CajaModule, CommonModule],
   controllers: [AppController],
   providers: [AppService],
 })

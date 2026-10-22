@@ -2,10 +2,11 @@
 
 interface NavLinksProps {
   onSelect: (section: string) => void;
+  developerMode: boolean;
   onOpenDeveloper: () => void;
 }
 
-export function NavLinks({ onSelect, onOpenDeveloper }: NavLinksProps) {
+export function NavLinks({ onSelect, developerMode, onOpenDeveloper }: NavLinksProps) {
   const linkClass = "group relative h-full shrink-0 bg-transparent px-1 text-[0.84rem] font-medium text-[#f5fbf8] transition hover:text-[#a8e7d6] focus-visible:text-[#a8e7d6] max-md:text-[0.72rem]";
   const underlineClass = "absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-[#8ed9c7] transition-transform group-hover:scale-x-100 group-focus-visible:scale-x-100";
 
@@ -23,10 +24,12 @@ export function NavLinks({ onSelect, onOpenDeveloper }: NavLinksProps) {
         <span className={underlineClass} />
         Estadísticas
       </button>
-      <button type="button" onClick={onOpenDeveloper} className={linkClass}>
-        <span className={underlineClass} />
-        Desarrollador
-      </button>
+      {developerMode && (
+        <button type="button" onClick={onOpenDeveloper} className={linkClass}>
+          <span className={underlineClass} />
+          Desarrollador
+        </button>
+      )}
     </section>
   );
 }

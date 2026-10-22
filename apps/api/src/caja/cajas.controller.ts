@@ -44,6 +44,11 @@ export class CajasController {
     return this.cajasService.update(id, updateCajaDto, req.user.userId);
   }
 
+  @Delete('limpieza')
+  limpiar(@Req() req: any) {
+    return this.cajasService.limpiar(req.user.userId);
+  }
+
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     return this.cajasService.remove(id, req.user.userId);

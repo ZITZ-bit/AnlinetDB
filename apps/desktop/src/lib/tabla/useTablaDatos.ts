@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { useRefrescarDatos } from "../../hooks/datos/useRefrescarDatos";
 import { api, type Cliente, type Corte } from "../api";
 import { coincideUsuarioOCedula, coincideZonaOCaja, normalizar } from "./busqueda";
 import { mesDePeriodo } from "../corte";
@@ -15,10 +16,16 @@ export function useTablaDatos(mesesAMostrar: string[]) {
   const [busquedaUsuario, setBusquedaUsuario] = useState("");
   const [busquedaZonaCaja, setBusquedaZonaCaja] = useState("");
 
-  useEffect(() => {
+  const cargarDatos = () => {
     api.clientes.getAll().then(setClientes).catch(() => setClientes([]));
     api.cortes.getAll().then(setCortes).catch(() => setCortes([]));
+  };
+
+  useEffect(() => {
+    cargarDatos();
   }, []);
+
+  useRefrescarDatos(cargarDatos);
 
   const guardarCorte = (actualizado: Corte) => {
     setCortes((actuales) => [
@@ -86,9 +93,9 @@ export function useTablaDatos(mesesAMostrar: string[]) {
 
   const fechaCorteCliente = (cliente: Cliente) => {
     const lista = cortesPorCliente.get(cliente.id) ?? [];
-    const corte = lista.find((item) => item.fechaCorte);
-    if (!corte?.fechaCorte) return "-";
-    return new Date(corte.fechaCorte).toLocaleDateString("es-ES", {
+    const corte = lista[0];
+    if (!corte?.fechaVencimiento) return "-";
+    return new Date(corte.fechaVencimiento).toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "2-digit",
     });

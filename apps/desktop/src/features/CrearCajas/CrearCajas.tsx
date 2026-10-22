@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import '../../styles/form-kit.css';
 import { api, getErrorMessage, type Zona } from '../../lib/api';
 import { useToast } from '../../components/toast/use-toast';
+import { useRefrescarDatos } from '../../hooks/datos/useRefrescarDatos';
 
 export default function CrearCajas() {
   const [codigoCaja, setCodigoCaja] = useState('');
@@ -17,9 +18,15 @@ export default function CrearCajas() {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
-  useEffect(() => {
+  const cargarZonas = () => {
     api.zonas.getAll().then(setZonas).catch(() => setZonas([]));
+  };
+
+  useEffect(() => {
+    cargarZonas();
   }, []);
+
+  useRefrescarDatos(cargarZonas);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
