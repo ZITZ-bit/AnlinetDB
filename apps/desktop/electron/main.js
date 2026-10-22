@@ -46,15 +46,37 @@ function waitForServer(port, retries = 50) {
   });
 }
 
+function getStandaloneDir() {
+  if (app.isPackaged) {
+    // El standalone se desempaqueta fuera del asar para que Node pueda leerlo.
+    return path.join(
+      process.resourcesPath,
+      "app.asar.unpacked",
+      ".next",
+      "standalone",
+      "apps",
+      "desktop",
+    );
+  }
+  return path.join(__dirname, "..", ".next", "standalone", "apps", "desktop");
+}
+
 function startNextServer(port) {
   return new Promise((resolve, reject) => {
-    const baseDir = path.join(__dirname, "..");
-    const standaloneDir = path.join(baseDir, ".next", "standalone", "apps", "desktop");
+    const standaloneDir = getStandaloneDir();
     const serverPath = path.join(standaloneDir, "server.js");
 
-    nextProcess = spawn("node", [serverPath], {
+    // Usamos el Node embebido en Electron (no requiere Node instalado en el equipo).
+    nextProcess = spawn(process.execPath, [serverPath], {
       stdio: "inherit",
       cwd: standaloneDir,
+      windowsHide: true,
+      env: {
+        ...process.env,
+        ELECTRON_RUN_AS_NODE: "1",
+        PORT: String(port),
+        HOSTNAME: "127.0.0.1",
+      },
     });
 
     nextProcess.on("error", (err) => {

@@ -9,7 +9,7 @@
     "dev": "concurrently --kill-others \"next dev --port 3000\" \"wait-on http://localhost:3000 && electron .\"",
     "dev:develop": "next dev",
     "dev:web": "next dev",
-    "build": "next build",
+    "build": "next build && node scripts/prepare-standalone.js",
     "start": "next start",
     "lint": "eslint",
     "package": "electron-builder --win --publish never"
@@ -42,10 +42,14 @@
     "directories": {
       "output": "release"
     },
+    "compression": "maximum",
+    "electronLanguages": ["es", "es-419", "en-US"],
     "files": [
       "electron/**/*",
-      ".next/**/*",
-      "package.json"
+      ".next/standalone/**/*",
+      "package.json",
+      "!node_modules/**/*",
+      "!**/*.map"
     ],
     "extraResources": [
       {
@@ -54,7 +58,8 @@
         "filter": ["**/*"]
       }
     ],
-    "asar": false,
+    "asar": true,
+    "asarUnpack": [".next/standalone/**/*"],
     "win": {
       "target": ["nsis", "zip"],
       "icon": "../lib/assets/icons/icon.ico"
