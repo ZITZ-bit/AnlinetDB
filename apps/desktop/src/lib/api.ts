@@ -241,4 +241,8 @@ export const api = {
       body: JSON.stringify(data),
     }),
   },
-};
+  backups: {
+    exportar: () => apiFetch<any>('/backups/exportar'),
+    importar: (data: any) => apiFetch<any>('/backups/importar', { method: 'POST', body: JSON.stringify(data) }),
+  },
+} as const;
