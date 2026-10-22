@@ -20,6 +20,7 @@ export interface Plan {
 export interface Caja {
   id: number;
   codigoCaja: string;
+  createdAt: string;
   direccion: string | null;
   zonaId: number | null;
   tipo: string;
@@ -33,6 +34,7 @@ export interface Caja {
 export interface Cliente {
   id: number;
   usuario: string;
+  createdAt: string;
   cedula: string | null;
   telefono: string | null;
   direccion: string;

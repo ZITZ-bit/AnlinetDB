@@ -7,6 +7,7 @@ import { useRefrescarDatos } from '@/hooks/datos/useRefrescarDatos';
 
 export default function Estadisticas() {
   const [totales, setTotales] = useState({ clientes: 0, cajas: 0, zonas: 0, cortes: 0 });
+  const [registros, setRegistros] = useState({ clientes: [] as Cliente[], cajas: [] as Caja[], zonas: [] as Zona[] });
   const [cargando, setCargando] = useState(true);
 
   const cargarTotales = () => {
@@ -17,6 +18,7 @@ export default function Estadisticas() {
       api.cortes.getAll(),
     ])
       .then(([clientes, cajas, zonas, cortes]: [Cliente[], Caja[], Zona[], Corte[]]) => {
+        setRegistros({ clientes, cajas, zonas });
         setTotales({
           clientes: clientes.length,
           cajas: cajas.length,
@@ -24,7 +26,10 @@ export default function Estadisticas() {
           cortes: cortes.length,
         });
       })
-      .catch(() => setTotales({ clientes: 0, cajas: 0, zonas: 0, cortes: 0 }))
+      .catch(() => {
+        setRegistros({ clientes: [], cajas: [], zonas: [] });
+        setTotales({ clientes: 0, cajas: 0, zonas: 0, cortes: 0 });
+      })
       .finally(() => setCargando(false));
   };
 
@@ -37,5 +42,5 @@ export default function Estadisticas() {
     cargarTotales();
   });
 
-  return <EstadisticasVista totales={totales} cargando={cargando} />;
+  return <EstadisticasVista totales={totales} registros={registros} cargando={cargando} />;
 }
