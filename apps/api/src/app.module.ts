@@ -10,9 +10,10 @@ import { CorteModule } from './corte/corte.module';
 import { ClientesModule } from './cliente/cliente.module';
 import { CajaModule } from './caja/caja.module';
 import { CommonModule } from './common/common.module';
+import { BackupsModule } from './backup/backup.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, PlanesModule, ZonasModule, CorteModule, ClientesModule, CajaModule, CommonModule],
+  imports: [PrismaModule, UsersModule, AuthModule, PlanesModule, ZonasModule, CorteModule, ClientesModule, CajaModule, CommonModule, BackupsModule],
   controllers: [AppController],
   providers: [AppService],
 })

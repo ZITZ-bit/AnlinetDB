@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
@@ -199,6 +199,23 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  ipcMain.handle("backup:save", async (_e, defaultName) => {
+    const r = await dialog.showSaveDialog(mainWindow, { defaultPath: defaultName || "backup.json", filters: [{ name: "JSON", extensions: ["json"] }] });
+    return r;
+  });
+  ipcMain.handle("backup:open", async () => {
+    const r = await dialog.showOpenDialog(mainWindow, { filters: [{ name: "JSON", extensions: ["json"] }], properties: ["openFile"] });
+    return r;
+  });
+  ipcMain.handle("backup:write", async (_e, filePath, content) => {
+    const fs = require("fs");
+    fs.writeFileSync(filePath, content, "utf-8");
+    return { ok: true };
+  });
+  ipcMain.handle("backup:read", async (_e, filePath) => {
+    const fs = require("fs");
+    return fs.readFileSync(filePath, "utf-8");
+  });
   createWindow();
 });
 
