@@ -42,7 +42,7 @@
     "directories": {
       "output": "release"
     },
-    "compression": "maximum",
+    "compression": "normal",
     "electronLanguages": ["es", "es-419", "en-US"],
     "files": [
       "electron/**/*",
