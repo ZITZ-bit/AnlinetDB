@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { api } from "../../lib/api";
 import { createPortal } from "react-dom";
 import { HiAdjustmentsHorizontal, HiArchiveBox, HiArrowDownTray, HiArrowPath, HiBell, HiCheck, HiChevronDown, HiClock, HiCodeBracket, HiPaintBrush } from "react-icons/hi2";
 
@@ -175,7 +176,7 @@ export function SettingsModal({ onClose, developerMode, onDeveloperModeChange }:
                   <strong className="text-sm text-[#18342f]">Crear copia ahora</strong>
                   <p className="text-sm text-[#657570]">Guarda una copia manual de los datos</p>
                 </div>
-                <button type="button" className={`${buttonMotion} inline-flex items-center gap-2 border border-[#d7e2de] px-3 py-2 text-sm font-semibold text-[#025f51] hover:bg-[#e8f4f0] max-sm:ml-14`}><HiArchiveBox aria-hidden="true" />Crear backup</button>
+                <button type="button" onClick={async () => { try { const data = await api.backups.exportar(); const r = await (window as any).api?.backupSave?.("backup.json"); if (r?.filePath) { await (window as any).api?.backupWrite?.(r.filePath, JSON.stringify(data, null, 2)); alert("Backup guardado"); } } catch (e:any) { alert(e?.message || "Error"); } }} className={`${buttonMotion} inline-flex items-center gap-2 border border-[#d7e2de] px-3 py-2 text-sm font-semibold text-[#025f51] hover:bg-[#e8f4f0] max-sm:ml-14`}><HiArchiveBox aria-hidden="true" />Crear backup</button>
               </div>
               <div className="flex items-center gap-4 py-4 max-sm:flex-wrap">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#e8f4f0] text-[#025f51]"><HiArrowDownTray aria-hidden="true" /></span>
@@ -183,7 +184,7 @@ export function SettingsModal({ onClose, developerMode, onDeveloperModeChange }:
                   <strong className="text-sm text-[#18342f]">Importar backup</strong>
                   <p className="text-sm text-[#657570]">Restaura desde un archivo de copia</p>
                 </div>
-                <button type="button" className={`${buttonMotion} inline-flex items-center gap-2 border border-[#d7e2de] px-3 py-2 text-sm font-semibold text-[#025f51] hover:bg-[#e8f4f0] max-sm:ml-14`}><HiArrowDownTray aria-hidden="true" />Importar archivo</button>
+                <button type="button" onClick={async () => { try { const r = await (window as any).api?.backupOpen?.(); const filePath = r?.filePaths?.[0]; if (filePath) { const content = await (window as any).api?.backupRead?.(filePath); const data = JSON.parse(content); await api.backups.importar(data); alert("Backup importado"); } } catch (e:any) { alert(e?.message || "Error"); } }} className={`${buttonMotion} inline-flex items-center gap-2 border border-[#d7e2de] px-3 py-2 text-sm font-semibold text-[#025f51] hover:bg-[#e8f4f0] max-sm:ml-14`}><HiArrowDownTray aria-hidden="true" />Importar archivo</button>
               </div>
               <div className="flex items-center gap-4 py-4 max-sm:flex-wrap">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#e8f4f0] text-[#025f51]"><HiClock aria-hidden="true" /></span>
