@@ -216,6 +216,11 @@ app.whenReady().then(() => {
     const fs = require("fs");
     return fs.readFileSync(filePath, "utf-8");
   });
+  ipcMain.handle("update-app", async () => {
+    const { shell } = require("electron");
+    await shell.openExternal("https://github.com/ZITZ-bit/AnlinetDB/releases/latest");
+    return { ok: true };
+  });
   createWindow();
 });
 
