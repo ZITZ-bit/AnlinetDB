@@ -13,7 +13,7 @@
     "start": "next start",
     "lint": "eslint",
     "prepackage": "node scripts/prepare-api-runtime.js",
-    "package": "electron-builder --win --publish never"
+    "package": "electron-builder --win --publish never && node scripts/copy-api-node-modules.js"
   },
   "dependencies": {
     "boxicons": "^2.1.4",
