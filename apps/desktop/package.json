@@ -6,8 +6,11 @@
   "private": true,
   "main": "electron/main.js",
   "scripts": {
+    "predev": "node ../../scripts/free-port.js 3000",
     "dev": "concurrently --kill-others \"next dev --port 3000\" \"wait-on http://localhost:3000 && electron .\"",
+    "predev:develop": "node ../../scripts/free-port.js 3000",
     "dev:develop": "next dev",
+    "predev:web": "node ../../scripts/free-port.js 3000",
     "dev:web": "next dev",
     "build": "next build && node scripts/prepare-standalone.js",
     "start": "next start",
