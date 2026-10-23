@@ -10,6 +10,9 @@ turbo.log
 out/
 next-env.d.ts
 *.tsbuildinfo
+# Reglas de agentes que next dev regenera en cada arranque
+apps/desktop/AGENTS.md
+apps/desktop/CLAUDE.md
 
 # NestJS
 dist/
